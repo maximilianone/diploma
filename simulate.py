@@ -1,11 +1,11 @@
 import numpy as np
 from random import *
 from individual import Individual
-from plot_builder import build_plot
 
 
 def simulate(time, step, population):
-    status_distribution_sequences = [[] for i in range(len(population.state_distribution))]
+    status_distribution_sequences = [[] for i in range(len(population.state_distribution) + 1)]
+
     for i in range(time):
         delete_dead(population)
         born(population)
@@ -18,11 +18,10 @@ def simulate(time, step, population):
 
             change_state(population, individual)
 
-        for j in range(len(status_distribution_sequences)):
+        for j in range(len(status_distribution_sequences) - 1):
             status_distribution_sequences[j].append(population.state_distribution[j])
-
-    time_sequence = list([i for i in range(time)])
-    build_plot(status_distribution_sequences, time_sequence, population.state_names)
+        status_distribution_sequences[len(population.state_distribution)].append(len(population))
+    return [status_distribution_sequences, population.transition_matrix]
 
 
 def delete_dead(population):
