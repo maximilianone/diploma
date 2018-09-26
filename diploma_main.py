@@ -11,7 +11,7 @@ df = pd.read_excel('data_studied.xlsx', usecols=[16, 19, 25, 26, 27, 28, 30], sk
 
 monte_carlo_iterations = 100
 
-time = 165
+time = 164
 step = [0, 1]
 
 examined_statistic = np.array(df['examined'].values.tolist())
@@ -44,10 +44,10 @@ transition_matrix_min_max = [[1, [0, hiv_infection], [0, 0], [0, 0]],
 
 population_distribution = [susceptible, hiv, aids]
 statuses_names = ['susceptible', 'hiv', 'aids']
-population = Population(population_distribution, statuses_names, [], [], birth_rate, birth_state_matrix)
+population = Population(population_distribution, [], [], birth_rate, birth_state_matrix)
 
 result_sequences = monte_carlo_apply(population, monte_carlo_iterations, transition_matrix_min_max, time, step,
                                      statistic_values)
 
-time_sequence = list([i for i in range(time)])
-build_plot(result_sequences[0], statistic_values, time_sequence, population.state_names)
+time_sequence = list([i for i in range(time + 1)])
+build_plot(result_sequences[0], statistic_values, time_sequence, statuses_names)

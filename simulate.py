@@ -4,7 +4,9 @@ from individual import Individual
 
 
 def simulate(time, step, population):
-    status_distribution_sequences = [[] for i in range(len(population.state_distribution) + 1)]
+    status_distribution_sequences = [[population.state_distribution[i]] for i in
+                                     range(len(population.state_distribution))]
+    status_distribution_sequences.append([len(population)])
 
     for i in range(time):
         delete_dead(population)

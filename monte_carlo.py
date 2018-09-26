@@ -33,8 +33,8 @@ def monte_carlo_apply(population, count, transition_matrix_min_max, time, step, 
                 print(deviation)
             print(iteration_deviation)
         print(i)
-
-    return optimum_results.append(deviation)
+    optimum_results.append(deviation)
+    return optimum_results
 
 
 def get_transition_matrix(transition_matrix_min_max):
