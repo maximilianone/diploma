@@ -5,8 +5,9 @@ life_expectancy = 70
 
 
 class Individual:
-    def __init__(self, state, age):
+    def __init__(self, state, medical_state, age):
         self.state = state
+        self.medical_state = medical_state
         self.age = age
         self.lifespan = get_lifespan()
 

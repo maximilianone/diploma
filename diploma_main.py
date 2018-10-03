@@ -7,9 +7,7 @@ from plot_builder import build_plot
 df = pd.read_excel('data_studied.xlsx', usecols=[16, 19, 25, 26, 27, 28, 30], skiprows=[0],
                    names=['hiv', 'aids', 'population', 'susceptible', 'examined', 'examined%', 'ph. intervention%'])
 
-# print(df['hiv'].values.tolist())
-
-monte_carlo_iterations = 100
+monte_carlo_iterations = 1
 
 time = 164
 step = [0, 1]
@@ -24,27 +22,33 @@ statistic_values = np.array([susceptible_statistic.tolist(), hiv_statistic.tolis
 susceptible = 10000
 hiv = 200
 aids = 14
+hiv_examined = 50
+susceptible_examined = 200
+aids_examined = 5
+hiv_treated = 0
+aids_treated = 0
 
-healthy_child_hiv_parent = 0.75
-
-birth_rate = 0.015 * (step[0] + (step[1] / 12))
-
-birth_state_matrix = [[1, 0, 0],
-                      [healthy_child_hiv_parent, 1 - healthy_child_hiv_parent, 0],
-                      [healthy_child_hiv_parent, 1 - healthy_child_hiv_parent, 0]]
+population_change_rate = [-0.12, 0.12]
 
 hiv_to_aids = 0.0203
-hiv_infection = 0.01513 * (step[0] + (step[1] / 12))
-aids_death = 0.0223 * (step[0] + (step[1] / 12))
-hiv_death = 0.01376 * (step[0] + (step[1] / 12))
+hiv_infection = 0.01513
+aids_death = 0.0223
+hiv_death = 0.01376
+hiv_treated_to_aids = 0.00203
+hiv_treated_death = 0.001376
+aids_treated_death = 0.005
 
 transition_matrix_min_max = [[1, [0, hiv_infection], [0, 0], [0, 0]],
                              [[0, 0], 1, [0, hiv_to_aids], [0, hiv_death]],
                              [[0, 0], [0, 0], 1, [0, aids_death]]]
 
+transition_treated_matrix_min_max = [[1, [0, hiv_infection], [0, 0], [0, 0]],
+                                     [[0, 0], 1, [0, hiv_treated_to_aids], [0, hiv_treated_death]],
+                                     [[0, 0], [0, 0], 1, [0, aids_treated_death]]]
+
 population_distribution = [susceptible, hiv, aids]
 statuses_names = ['susceptible', 'hiv', 'aids']
-population = Population(population_distribution, [], [], birth_rate, birth_state_matrix)
+population = Population(population_distribution, [], [], population_change_rate)
 
 result_sequences = monte_carlo_apply(population, monte_carlo_iterations, transition_matrix_min_max, time, step,
                                      statistic_values)

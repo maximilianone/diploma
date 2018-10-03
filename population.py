@@ -2,9 +2,10 @@ from individual import Individual
 
 
 class Population:
-    def __init__(self, state_distribution, transition_matrix, members, birth_rate, birth_state_matrix):
+    def __init__(self, state_distribution, members, birth_rate, birth_state_matrix):
         self.state_distribution = state_distribution
-        self.transition_matrix = transition_matrix
+        self.transition_matrix = []
+        self.transition_treated_matrix = []
         self.members = members
         self.birth_rate = birth_rate
         self.birth_state_matrix = birth_state_matrix
