@@ -89,9 +89,9 @@ def change_medical_state(population, individual, transition_matrix):
                 population.state_distribution[individual.state][individual.medical_state] += 1
                 individual.medical_state = 2
                 population.state_distribution[individual.state][individual.medical_state] += 1
-    else:
-        if transition_matrix[1] >= uniform(0, 1):
-            
+    # else:
+    #     if transition_matrix[1] >= uniform(0, 1):
+
 
 
 def markov_transition(rand, transition_probability_vector, transition_number):
