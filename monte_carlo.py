@@ -4,13 +4,16 @@ import numpy as np
 import copy
 
 
-def monte_carlo_apply(population, count, transition_matrix_min_max, time, step, statistic_values):
+def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
+                      population_change_rate, statistic_values, time, step, count):
     optimum_results = []
     deviation = 0
 
     for i in range(count):
         population_copy = copy.deepcopy(population)
         population_copy.transition_matrix = get_transition_matrix(transition_matrix_min_max)
+        population_copy.transition_treated_matrix_min_max = get_transition_matrix(transition_treated_matrix_min_max)
+        population_copy.population_change_rate = uniform(population_change_rate[0], population_change_rate[1])
 
         simulation_result = simulate(time, step, population_copy)
         state_distribution = np.array(simulation_result[0])

@@ -9,8 +9,7 @@ def simulate(time, step, population):
     status_distribution_sequences.append([len(population)])
 
     for i in range(time):
-        delete_dead(population)
-        born(population)
+        change_population_number(population)
 
         for individual in population.members:
             individual.age = np.sum([individual.age, step], axis=0)
@@ -26,60 +25,32 @@ def simulate(time, step, population):
     return [status_distribution_sequences, population.transition_matrix]
 
 
-def delete_dead(population):
-    for individual in population.members:
-        if individual.age[0] > individual.lifespan[0] or (
-                individual.age[0] == individual.age[0] and individual.age[1] > individual.age[1]):
-            population.state_distribution[individual.state] -= 1
-            population.members.remove(individual)
+def change_population_number(population):
+    if population.population_change_rate > 0:
+        born(population)
+    elif population.population_change_rate < 0:
+        death(population)
 
 
 def born(population):
-    population_replenishment = np.ceil(uniform(0, 2) * population.birth_rate * len(population))
-    count = prepare_population_count(population_replenishment)
-    children_distribution = []
-
-    for state_population in population.state_distribution:
-        children_distribution.append(count * state_population / len(population))
-
-    children_distribution = prepare_children_distribution(children_distribution, count)
-    add_born(population, children_distribution)
+    population_len = len(population)
+    for i in range(population_len):
+        rand = uniform(0, 1)
+        probability = population.members[i].get_birth_probability(population.population_change_rate)
+        if probability >= rand:
+            population.members.append(Individual(0, 0, 0))
 
 
-def add_born(population, children_distribution):
-    for i in range(len(children_distribution)):
-        for j in range(children_distribution[i]):
-            rand = uniform(0, 1)
-            individual = Individual(0, [0, 0])
-            for k in range(len(population.birth_state_matrix[i])):
-                if markov_transition(rand, population.birth_state_matrix[i], k):
-                    individual.state = k
-                    population.members.append(individual)
-                    population.state_distribution[k] += 1
+def death(population):
+    for individual in population.members:
+        rand = uniform(0, 1)
+        probability = individual.get_death_probability(np.absolute(population.population_change_rate))
+        if probability >= rand:
+            population.members.remove(individual)
 
 
 def prepare_population_count(count):
     return int(np.round(count))
-
-
-def prepare_children_distribution(children_distribution, count):
-    prepared_distribution = []
-    counter = len(children_distribution)
-    for i in range(counter):
-        if not count > 0:
-            prepared_distribution.append(0)
-            continue
-        max_distribution = np.max(children_distribution)
-        children_distribution.remove(max_distribution)
-        children_distribution_count = np.round(max_distribution)
-        if count - children_distribution_count >= 0:
-            if children_distribution_count == 0:
-                children_distribution_count += 1
-        else:
-            children_distribution_count = count
-        count -= children_distribution_count
-        prepared_distribution.append(int(children_distribution_count))
-    return prepared_distribution
 
 
 def change_state(population, individual):
