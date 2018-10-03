@@ -2,6 +2,7 @@ from random import *
 import numpy as np
 
 life_expectancy = 70
+mean_examination_period = [0, 6]
 
 
 class Individual:
@@ -9,6 +10,7 @@ class Individual:
         self.state = state
         self.medical_state = medical_state
         self.age = age
+        self.until_examination_count = 0
 
     def __repr__(self):
         return 'State :' + str(self.state) + ' Medical state :' + str(self.medical_state) + ' Age:' + str(self.age)
@@ -25,6 +27,9 @@ class Individual:
 
     def get_birth_probability(self, probability):
         return probability * (1.098933 * np.exp(-(self.age[0] - 39.0966) ** 2 / (2 * 15.4054) ** 2))
+
+    def set_until_examination_count(self):
+        self.until_examination_count = randint(0, mean_examination_period)
 
 # def get_lifespan():
 #     return [int(np.round(life_expectancy *(-np.log(random()))**0.3)), randint(0, 11)]

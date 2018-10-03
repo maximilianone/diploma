@@ -10,6 +10,7 @@ class Population:
         self.transition_medical_matrix = transition_medical_matrix
         self.members = []
         self.population_change_rate = 0
+        self.wrong_examination = 0
         self.populate()
 
     def __len__(self):

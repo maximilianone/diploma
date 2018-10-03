@@ -37,11 +37,14 @@ hiv = 200
 aids = 14
 susceptible_examined = 200
 hiv_examined = 50
-aids_examined = 5
+hiv_wrong_examined = 0
 hiv_treated = 0
+aids_examined = 5
+aids_wrong_examined = 0
 aids_treated = 0
 
-population_change_rate = [-0.12, 0.105]
+population_change_rate = [-0.012, 0.0105]
+wrong_examination = [0, 0.1]
 
 hiv_to_aids = 0.0203
 hiv_infection = 0.01513
@@ -55,23 +58,24 @@ transition_matrix_min_max = [[1, [0, hiv_infection], [0, 0], [0, 0]],
                              [[0, 0], 1, [0, hiv_to_aids], [0, hiv_death]],
                              [[0, 0], [0, 0], 1, [0, aids_death]]]
 
-transition_treated_matrix_min_max = [[0],
+transition_treated_matrix_min_max = [[[0]],
                                      [[0, 0], 1, [0, hiv_treated_to_aids], [0, hiv_treated_death]],
                                      [[0, 0], [0, 0], 1, [0, aids_treated_death]]]
 
 transition_medical_matrix = np.array([np.array(df['examined%'].values.tolist()),
                                       np.array(df['treated%'].values.tolist())])
 
-population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_examined, hiv_treated],
-                           [aids, aids_examined, aids_treated]]
+population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_examined, hiv_examined, hiv_treated],
+                           [aids, aids_wrong_examined, aids_examined, aids_treated]]
 
 statuses_names = ['susceptible', 'hiv', 'aids']
-medical_statuses_names = ['', 'diagnosed', 'treated']
+medical_statuses_names = ['', 'examined', 'diagnosed', 'treated']
 
 population = Population(population_distribution, transition_medical_matrix)
 
 result_sequences = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
-                                     population_change_rate, statistic_values, time, step, monte_carlo_iterations)
+                                     population_change_rate, wrong_examination, statistic_values,
+                                     time, step, monte_carlo_iterations)
 
 time_sequence = list([i for i in range(time + 1)])
 build_plot(result_sequences[0], statistic_values, time_sequence, statuses_names)
