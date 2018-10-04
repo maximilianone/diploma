@@ -27,7 +27,8 @@ class Population:
             for j in range(len(state_distribution[i])):
                 for k in range(state_distribution[i][j]):
                     individual = Individual(i, j, 0)
-                    individual.set_age(int(np.round(1/self.population_death_rate)))
+                    individual.set_lifespan(int(np.round(1/self.population_death_rate)))
+                    individual.set_age()
                     self.members.append(individual)
 
     def get_infection_quantifier(self):

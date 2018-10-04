@@ -44,7 +44,7 @@ aids_wrong_examined = 0
 aids_treated = 0
 
 population_birth_rate = [0.015, 0.015]
-population_death_rate = [0.01, 0.012]
+population_death_rate = [0.015, 0.015]
 
 wrong_examination = [0, 0.1]
 

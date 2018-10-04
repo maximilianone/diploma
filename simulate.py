@@ -10,10 +10,10 @@ def simulate(time, step, population):
     population_sequence = [len(population)]
 
     for i in range(time):
-        born(population, step)
+        born(population)
 
         for individual in population.members:
-            if death(individual, population, step):
+            if death(individual, population):
                 continue
 
             individual.age = increment_time(individual.age, step)
@@ -39,20 +39,20 @@ def increment_time(time, step):
     return time
 
 
-def born(population, step):
+def born(population):
     new_individuals_count = prepare_population_count(uniform(0, 2) *
-                                                     len(population) * population.population_birth_rate * (
-                                                                 step[0] + step[1] / 12))
+                                                     len(population) * population.population_birth_rate)
     for i in range(new_individuals_count):
-        population.members.append(Individual(0, 0, [0, 0]))
+        individual = Individual(0, 0, [0, 0])
+        individual.set_lifespan(prepare_population_count(1/population.population_death_rate))
+        population.members.append(individual)
         population.state_distribution[0][0] += 1
 
 
-def death(individual, population, step):
-    rand = uniform(0, 1)
-    probability = individual.get_death_probability(step, population.population_death_rate)
+def death(individual, population):
     is_dead = False
-    if probability >= rand:
+    if individual.age[0] > individual.lifespan[0] or (
+            individual.age[0] == individual.lifespan[0] and individual.age[1] > individual.lifespan[1]):
         population.state_distribution[individual.state][individual.medical_state] -= 1
         if not individual.medical_state == 0:
             population.state_distribution[individual.state][0] -= 1
