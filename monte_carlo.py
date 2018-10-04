@@ -5,7 +5,8 @@ import copy
 
 
 def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
-                      population_change_rate, wrong_examination, statistic_values, time, step, count):
+                      population_birth_rate, population_death_rate, wrong_examination, statistic_values,
+                      time, step, count):
     optimum_results = []
     deviation = 0
 
@@ -13,7 +14,8 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
         population_copy = copy.deepcopy(population)
         population_copy.transition_matrix = get_transition_matrix(transition_matrix_min_max)
         population_copy.transition_treated_matrix = get_transition_matrix(transition_treated_matrix_min_max)
-        population_copy.population_change_rate = uniform(population_change_rate[0], population_change_rate[1])
+        population_copy.population_birth_rate = uniform(population_birth_rate[0], population_birth_rate[1])
+        population_copy.population_death_rate = uniform(population_death_rate[0], population_death_rate[1])
         population_copy.wrong_examination = uniform(wrong_examination[0], wrong_examination[1])
 
         simulation_result = simulate(time, step, population_copy)

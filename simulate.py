@@ -10,13 +10,16 @@ def simulate(time, step, population):
     population_sequence = [len(population)]
 
     for i in range(time):
-        change_population_number(population)
+        born(population)
+        death(population)
 
         for individual in population.members:
             individual.age = np.sum([individual.age, step], axis=0)
             if individual.age[1] == 12:
                 individual.age[0] += 1
                 individual.age[1] = 0
+            if sum(individual.until_examination_count) > 0:
+                individual.until_examination_count = np.subtract(individual.until_examination_count, step)
 
             change_state(population, individual)
             change_medical_state(population, individual, [population.transition_medical_matrix[0][i + 1],
@@ -27,13 +30,6 @@ def simulate(time, step, population):
                 status_distribution_sequences[j][k].append(population.state_distribution[j][k])
         population_sequence.append(len(population))
     return [status_distribution_sequences, population.transition_matrix]
-
-
-def change_population_number(population):
-    if population.population_change_rate > 0:
-        born(population)
-    elif population.population_change_rate < 0:
-        death(population)
 
 
 def born(population):
@@ -51,7 +47,7 @@ def death(population):
         rand = uniform(0, 1)
         probability = individual.get_death_probability(np.absolute(population.population_change_rate))
         if probability >= rand:
-            population.state_distribution[individual.state][individual.medical_state] -= 1
+            # population.state_distribution[individual.state][individual.medical_state] -= 1
             if not individual.medical_state == 0:
                 population.state_distribution[individual.state][0] -= 1
             population.members.remove(individual)
@@ -81,7 +77,7 @@ def change_state_with_matrix(population, individual, transition_matrix):
 
 
 def change_medical_state(population, individual, transition_matrix):
-    if individual.medical_state <= 1 and individual.until_examination_count <= 0:
+    if individual.medical_state <= 1 and sum(individual.until_examination_count) <= 0:
         if transition_matrix[0] >= uniform(0, 1):
             individual.medical_state = 1
             population.state_distribution[individual.state][individual.medical_state] += 1
@@ -89,9 +85,9 @@ def change_medical_state(population, individual, transition_matrix):
                 population.state_distribution[individual.state][individual.medical_state] += 1
                 individual.medical_state = 2
                 population.state_distribution[individual.state][individual.medical_state] += 1
-    # else:
-    #     if transition_matrix[1] >= uniform(0, 1):
-
+    elif individual.medical_state == 2 and transition_matrix[1] >= uniform(0, 1):
+        individual.medical_state = 3
+        population.state_distribution[individual.state][individual.medical_state] += 1
 
 
 def markov_transition(rand, transition_probability_vector, transition_number):
