@@ -17,15 +17,17 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
         population_copy.population_birth_rate = uniform(population_birth_rate[0], population_birth_rate[1])
         population_copy.population_death_rate = uniform(population_death_rate[0], population_death_rate[1])
         population_copy.wrong_examination = uniform(wrong_examination[0], wrong_examination[1])
+        population_copy.populate()
 
-        simulation_result = simulate(time, step, population_copy)
-        state_distribution = np.array(simulation_result[0])
+        distribution_sequences, population_sequence = simulate(time, step, population_copy)
+        print(distribution_sequences)
+        state_distribution = np.array(distribution_sequences)
         state_indexes = [i for i in range(len(state_distribution) - 1)]
         iteration_results = np.array(
             state_distribution[state_indexes, :] / state_distribution[len(state_distribution) - 1, :])
         if i == 0:
             optimum_results.append(iteration_results)
-            optimum_results.append(simulation_result[1])
+            optimum_results.append(population_copy.transition_matrix)
             deviation = np.sqrt(np.sum(
                 [a ** 2 for a in (a_row for a_row in (iteration_results - statistic_values))]) / iteration_results.size)
             print(deviation)
@@ -35,7 +37,7 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
             if iteration_deviation < deviation:
                 deviation = iteration_deviation
                 optimum_results[0] = iteration_results
-                optimum_results[1] = simulation_result[1]
+                optimum_results[1] = population_copy.transition_matrix
                 print(deviation)
             print(iteration_deviation)
         print(i)

@@ -1,12 +1,9 @@
 from individual import Individual
 from random import *
 import numpy as np
+import scipy.stats as s
 
 individual = Individual(0, 0, 0)
-
-individual.set_age()
-
-print(individual.age, individual.get_death_probability(0.15), individual.get_birth_probability(0.105))
-
-print(randint(0, 0))
-print(np.subtract([0, 2], [0, 1]))
+ast = np.random.randint(0,70,100)
+hist, bin_edges = np.histogram(ast)
+print(s.exponweib.sf(10, 1, 2, loc=0, scale=1))

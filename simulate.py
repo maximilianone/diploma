@@ -10,47 +10,55 @@ def simulate(time, step, population):
     population_sequence = [len(population)]
 
     for i in range(time):
-        born(population)
-        death(population)
+        born(population, step)
 
         for individual in population.members:
-            individual.age = np.sum([individual.age, step], axis=0)
-            if individual.age[1] == 12:
-                individual.age[0] += 1
-                individual.age[1] = 0
-            if sum(individual.until_examination_count) > 0:
-                individual.until_examination_count = np.subtract(individual.until_examination_count, step)
+            if death(individual, population, step):
+                continue
 
-            change_state(population, individual)
+            individual.age = increment_time(individual.age, step)
+            if individual.medical_state == 1:
+                individual.last_examination_count = increment_time(individual.last_examination_count, step)
+
             change_medical_state(population, individual, [population.transition_medical_matrix[0][i + 1],
                                                           population.transition_medical_matrix[1][i + 1]])
+            change_state(population, individual)
 
-        for j in range(len(status_distribution_sequences) - 1):
+        for j in range(len(status_distribution_sequences)):
             for k in range(len(status_distribution_sequences[j])):
                 status_distribution_sequences[j][k].append(population.state_distribution[j][k])
         population_sequence.append(len(population))
-    return [status_distribution_sequences, population.transition_matrix]
+    return status_distribution_sequences, population_sequence
 
 
-def born(population):
-    population_len = len(population)
-    for i in range(population_len):
-        rand = uniform(0, 1)
-        probability = population.members[i].get_birth_probability(population.population_change_rate)
-        if probability >= rand:
-            population.members.append(Individual(0, 0, [0, 0]))
-            population.state_distribution[0][0] += 1
+def increment_time(time, step):
+    time = np.sum([time, step], axis=0)
+    if time[1] == 12:
+        time[0] += 1
+        time[1] = 0
+    return time
 
 
-def death(population):
-    for individual in population.members:
-        rand = uniform(0, 1)
-        probability = individual.get_death_probability(np.absolute(population.population_change_rate))
-        if probability >= rand:
-            # population.state_distribution[individual.state][individual.medical_state] -= 1
-            if not individual.medical_state == 0:
-                population.state_distribution[individual.state][0] -= 1
-            population.members.remove(individual)
+def born(population, step):
+    new_individuals_count = prepare_population_count(uniform(0, 2) *
+                                                     len(population) * population.population_birth_rate * (
+                                                                 step[0] + step[1] / 12))
+    for i in range(new_individuals_count):
+        population.members.append(Individual(0, 0, [0, 0]))
+        population.state_distribution[0][0] += 1
+
+
+def death(individual, population, step):
+    rand = uniform(0, 1)
+    probability = individual.get_death_probability(step, population.population_death_rate)
+    is_dead = False
+    if probability >= rand:
+        population.state_distribution[individual.state][individual.medical_state] -= 1
+        if not individual.medical_state == 0:
+            population.state_distribution[individual.state][0] -= 1
+        population.members.remove(individual)
+        is_dead = True
+    return is_dead
 
 
 def prepare_population_count(count):
@@ -68,24 +76,31 @@ def change_state_with_matrix(population, individual, transition_matrix):
     rand = uniform(0, 1)
     for i in range(len(transition_matrix[individual.state])):
         if markov_transition(rand, transition_matrix[individual.state], i):
-            population.state_distribution[individual.state] -= 1
+            population.state_distribution[individual.state][individual.medical_state] -= 1
+            if not individual.medical_state == 0:
+                population.state_distribution[individual.state][0] -= 1
             if i == len(transition_matrix[individual.state]) - 1:
                 population.members.remove(individual)
             else:
                 individual.state = i
-                population.state_distribution[individual.state] += 1
+                population.state_distribution[individual.state][individual.medical_state] += 1
+                if not individual.medical_state == 0:
+                    population.state_distribution[individual.state][0] += 1
 
 
 def change_medical_state(population, individual, transition_matrix):
-    if individual.medical_state <= 1 and sum(individual.until_examination_count) <= 0:
-        if transition_matrix[0] >= uniform(0, 1):
-            individual.medical_state = 1
-            population.state_distribution[individual.state][individual.medical_state] += 1
-            if population.wrong_examination <= uniform(0, 1) and not individual.state == 0:
+    if individual.medical_state <= 1:
+        if individual.get_examination_probability(transition_matrix[0]) >= uniform(0, 1):
+            individual.last_examination_count = [0, 0]
+            if individual.medical_state == 0:
+                individual.medical_state = 1
                 population.state_distribution[individual.state][individual.medical_state] += 1
+            if population.wrong_examination <= uniform(0, 1) and not individual.state == 0:
+                population.state_distribution[individual.state][individual.medical_state] -= 1
                 individual.medical_state = 2
                 population.state_distribution[individual.state][individual.medical_state] += 1
     elif individual.medical_state == 2 and transition_matrix[1] >= uniform(0, 1):
+        population.state_distribution[individual.state][individual.medical_state] -= 1
         individual.medical_state = 3
         population.state_distribution[individual.state][individual.medical_state] += 1
 
