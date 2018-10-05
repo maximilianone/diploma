@@ -73,6 +73,8 @@ def change_state(population, individual):
 
 
 def change_state_with_matrix(population, individual, transition_matrix):
+    if individual.state == 0:
+        population.transition_matrix[0][1] = population.get_infection_probability()
     rand = uniform(0, 1)
     for i in range(len(transition_matrix[individual.state])):
         if markov_transition(rand, transition_matrix[individual.state], i):

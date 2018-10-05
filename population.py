@@ -13,6 +13,7 @@ class Population:
         self.population_birth_rate = 0
         self.population_death_rate = 0
         self.wrong_examination = 0
+        self.infection_vector = []
 
     def __len__(self):
         return len(self.members)
@@ -27,9 +28,11 @@ class Population:
             for j in range(len(state_distribution[i])):
                 for k in range(state_distribution[i][j]):
                     individual = Individual(i, j, 0)
-                    individual.set_lifespan(int(np.round(1/self.population_death_rate)))
+                    individual.set_lifespan(int(np.round(1 / self.population_death_rate)))
                     individual.set_age()
                     self.members.append(individual)
 
-    def get_infection_quantifier(self):
-        return (self.state_distribution[1][0] + self.state_distribution[2][0])/len(self)
+    def get_infection_probability(self):
+        infection_probability = 0
+        for i in range(1, len(self.state_distribution)):
+            infection_probability

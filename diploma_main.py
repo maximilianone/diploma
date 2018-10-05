@@ -21,8 +21,8 @@ hiv_statistic = np.array(df['hiv'].values.tolist()) / examined_statistic
 aids_statistic = np.array(df['aids'].values.tolist()) / examined_statistic
 susceptible_statistic = 1 - hiv_statistic - aids_statistic
 
-hiv_treated_to_all = (hiv_statistic/(hiv_statistic + aids_statistic))
-aids_treated_to_all = 1 - (hiv_statistic/(hiv_statistic + aids_statistic))
+hiv_treated_to_all = (hiv_statistic / (hiv_statistic + aids_statistic))
+aids_treated_to_all = 1 - (hiv_statistic / (hiv_statistic + aids_statistic))
 
 susceptible_examined_statistic = susceptible_statistic * examined_statistic_percent
 hiv_examined_statistic = hiv_statistic * examined_statistic_percent
@@ -43,20 +43,26 @@ aids_examined = 5
 aids_wrong_examined = 0
 aids_treated = 0
 
-population_birth_rate = [0.015, 0.015]
-population_death_rate = [0.015, 0.015]
+# birth rate considering step duration
+population_birth_rate = [0.0008, 0.001]
+# year death rate
+population_death_rate = [0.012, 0.015]
 
 wrong_examination = [0, 0.1]
 
-hiv_to_aids = 0.0203
-hiv_infection = 0.01513
-aids_death = 0.0223
-hiv_death = 0.01376
-hiv_treated_to_aids = 0.00203
-hiv_treated_death = 0.001376
-aids_treated_death = 0.005
+hiv_infection = 0.01
+hiv_treated_infection = 0.002
 
-transition_matrix_min_max = [[1, [0, hiv_infection], [0, 0], [0, 0]],
+infection_vector = [[0, hiv_infection], [0, hiv_treated_infection]]
+
+hiv_to_aids = 0.015
+aids_death = 0.015
+hiv_death = 0.01
+hiv_treated_to_aids = 0.0015
+hiv_treated_death = 0.001
+aids_treated_death = 0.002
+
+transition_matrix_min_max = [[1, [0, 0], [0, 0], [0, 0]],
                              [[0, 0], 1, [0, hiv_to_aids], [0, hiv_death]],
                              [[0, 0], [0, 0], 1, [0, aids_death]]]
 
@@ -76,7 +82,8 @@ medical_statuses_names = ['', 'examined', 'diagnosed', 'treated']
 population = Population(population_distribution, transition_medical_matrix)
 
 result_sequences = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
-                                     population_birth_rate, population_death_rate, wrong_examination, statistic_values,
+                                     population_birth_rate, population_death_rate, infection_vector,
+                                     wrong_examination, statistic_values,
                                      time, step, monte_carlo_iterations)
 
 time_sequence = list([i for i in range(time + 1)])

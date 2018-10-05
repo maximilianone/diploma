@@ -18,19 +18,12 @@ class Individual:
 
     def set_age(self):
         self.age = [randint(0, self.lifespan[0] - 1), randint(0, 11)]
-
-    def get_death_probability(self, step, death_rate):
-        return (1 - np.exp(-(self.age[0] * death_rate) ** 4)) * (step[0] + step[1] / 12)
+    # def get_death_probability(self, step, death_rate):
+    #     return (1 - np.exp(-(self.age[0] * death_rate) ** 4)) * (step[0] + step[1] / 12)
 
     def get_examination_probability(self, probability):
         return probability * np.exp(
             probability * (self.last_examination_count[0] * 12 + self.last_examination_count[1]))
-
-    # probability = probability * (16729699.82 + ((1.180329 - 16729700) / (1 + (self.age[0] / 553.2562) ** 7.453266)))
-    # return probability if probability <= 1 else 1
-    #
-    # def get_birth_probability(self, probability):
-    #     return probability * (1.098933 * np.exp(-(self.age[0] - 39.0966) ** 2 / (2 * 15.4054) ** 2))
 
     def set_lifespan(self, life_expectancy):
         self.lifespan = [int(np.round(life_expectancy * (-np.log(random())) ** 0.3)), randint(0, 11)]
