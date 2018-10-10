@@ -33,6 +33,10 @@ class Population:
                     self.members.append(individual)
 
     def get_infection_probability(self):
-        infection_probability = 0
+        infected_people = 0
+        infected_treated_people = 0
         for i in range(1, len(self.state_distribution)):
-            infection_probability
+            infected_people += self.state_distribution[i][0]
+            infected_treated_people += self.state_distribution[i][3]
+        return self.infection_vector[0] * (infected_people - infected_treated_people) / len(self) + \
+               self.infection_vector[1] * infected_treated_people / len(self)

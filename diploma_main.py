@@ -30,7 +30,16 @@ hiv_treated_statistic = hiv_treated_to_all * treated_statistic
 aids_examined_statistic = aids_statistic * examined_statistic_percent
 aids_treated_statistic = aids_treated_to_all * treated_statistic
 
-statistic_values = np.array([[susceptible_statistic.tolist()], [hiv_statistic.tolist()], [aids_statistic.tolist()]])
+empty_list_hiv = np.array([0 for i in range(time + 1)])
+empty_list_aids = np.array([0 for j in range(time + 1)])
+
+
+statistic_values = [np.array([susceptible_statistic.tolist(), susceptible_examined_statistic.tolist()]),
+                    np.array([hiv_statistic.tolist(), empty_list_hiv.tolist(), hiv_examined_statistic.tolist(),
+                              hiv_treated_statistic.tolist()]),
+                    np.array(
+                        [aids_statistic.tolist(), empty_list_aids.tolist(), aids_examined_statistic.tolist(),
+                         aids_treated_statistic.tolist()])]
 
 susceptible = 10000
 hiv = 200
@@ -44,16 +53,16 @@ aids_wrong_examined = 0
 aids_treated = 0
 
 # birth rate considering step duration
-population_birth_rate = [0.0008, 0.001]
+population_birth_rate = [0.0005, 0.000875]
 # year death rate
 population_death_rate = [0.012, 0.015]
 
 wrong_examination = [0, 0.1]
 
-hiv_infection = 0.01
-hiv_treated_infection = 0.002
+hiv_infection_quantifier = [0.05, 0.1]
+hiv_treated_infection_quantifier = [0.01, 0.02]
 
-infection_vector = [[0, hiv_infection], [0, hiv_treated_infection]]
+infection_vector = [hiv_infection_quantifier, hiv_treated_infection_quantifier]
 
 hiv_to_aids = 0.015
 aids_death = 0.015
@@ -87,4 +96,4 @@ result_sequences = monte_carlo_apply(population, transition_matrix_min_max, tran
                                      time, step, monte_carlo_iterations)
 
 time_sequence = list([i for i in range(time + 1)])
-build_plot(result_sequences[0], statistic_values, time_sequence, statuses_names)
+build_plot(result_sequences[0], statistic_values, time_sequence, statuses_names, medical_statuses_names)
