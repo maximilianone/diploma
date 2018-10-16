@@ -44,11 +44,11 @@ statistic_values = [np.array([susceptible_statistic.tolist(), susceptible_examin
 susceptible = 10000
 hiv = 200
 aids = 14
-susceptible_examined = 200
-hiv_examined = 50
+susceptible_examined = 500
+hiv_examined = 9
 hiv_wrong_examined = 0
 hiv_treated = 0
-aids_examined = 5
+aids_examined = 1
 aids_wrong_examined = 0
 aids_treated = 0
 
@@ -79,8 +79,9 @@ transition_treated_matrix_min_max = [[[0]],
                                      [[0, 0], 1, [0, hiv_treated_to_aids], [0, hiv_treated_death]],
                                      [[0, 0], [0, 0], 1, [0, aids_treated_death]]]
 
-transition_medical_matrix = np.array([np.array(df['examined%'].values.tolist()),
-                                      np.array(df['treated%'].values.tolist())])
+examination = [0, 0.001]
+treating = [0, 0.002]
+transition_medical_matrix = [examination, treating]
 
 population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_examined, hiv_examined, hiv_treated],
                            [aids, aids_wrong_examined, aids_examined, aids_treated]]
@@ -88,11 +89,11 @@ population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_
 statuses_names = ['susceptible', 'hiv', 'aids']
 medical_statuses_names = ['', 'examined', 'diagnosed', 'treated']
 
-population = Population(population_distribution, transition_medical_matrix)
+population = Population(population_distribution)
 
 result_sequences = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
-                                     population_birth_rate, population_death_rate, infection_vector,
-                                     wrong_examination, statistic_values,
+                                     transition_medical_matrix, population_birth_rate, population_death_rate,
+                                     infection_vector, wrong_examination, statistic_values,
                                      time, step, monte_carlo_iterations)
 
 time_sequence = list([i for i in range(time + 1)])

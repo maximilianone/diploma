@@ -20,8 +20,7 @@ def simulate(time, step, population):
             if individual.medical_state == 1:
                 individual.last_examination_count = increment_time(individual.last_examination_count, step)
 
-            change_medical_state(population, individual, [population.transition_medical_matrix[0][i + 1],
-                                                          population.transition_medical_matrix[1][i + 1]])
+            change_medical_state(population, individual, population.transition_medical_matrix)
             change_state(population, individual)
 
         for j in range(len(status_distribution_sequences)):

@@ -1,7 +1,8 @@
 from individual import Individual
 from random import *
 import numpy as np
-import scipy.stats as s
 
 
-print([0 for i in range(10)])
+a = np.array([[1, 2], [2, 3]])
+b = np.array([[2, 4], [3, 6]])
+print(a * b)

@@ -4,11 +4,11 @@ import numpy as np
 
 
 class Population:
-    def __init__(self, state_distribution, transition_medical_matrix):
+    def __init__(self, state_distribution):
         self.state_distribution = state_distribution
         self.transition_matrix = []
         self.transition_treated_matrix = []
-        self.transition_medical_matrix = transition_medical_matrix
+        self.transition_medical_matrix = []
         self.members = []
         self.population_birth_rate = 0
         self.population_death_rate = 0
