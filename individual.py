@@ -17,9 +17,8 @@ class Individual:
         return 'State :' + str(self.state) + ' Medical state :' + str(self.medical_state) + ' Age:' + str(self.age)
 
     def set_age(self):
-        self.age = [randint(0, self.lifespan[0] - 1), randint(0, 11)]
-    # def get_death_probability(self, step, death_rate):
-    #     return (1 - np.exp(-(self.age[0] * death_rate) ** 4)) * (step[0] + step[1] / 12)
+        year = randint(0, self.lifespan[0] - 1) if self.lifespan[0] > 1 else 1
+        self.age = [year, randint(0, 11)]
 
     def get_examination_probability(self, probability):
         return probability * np.exp(

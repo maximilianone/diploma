@@ -7,7 +7,7 @@ from plot_builder import build_plot
 df = pd.read_excel('data_studied.xlsx', usecols=[16, 19, 25, 26, 27, 28, 30], skiprows=[0],
                    names=['hiv', 'aids', 'population', 'susceptible', 'examined', 'examined%', 'treated%'])
 
-monte_carlo_iterations = 1
+monte_carlo_iterations = 100
 
 time = 164
 step = [0, 1]
@@ -41,10 +41,10 @@ statistic_values = [np.array([susceptible_statistic.tolist(), susceptible_examin
                         [aids_statistic.tolist(), empty_list_aids.tolist(), aids_examined_statistic.tolist(),
                          aids_treated_statistic.tolist()])]
 
-susceptible = 10000
-hiv = 200
+susceptible = 9993
+hiv = 207
 aids = 14
-susceptible_examined = 500
+susceptible_examined = 439
 hiv_examined = 9
 hiv_wrong_examined = 0
 hiv_treated = 0
@@ -59,8 +59,8 @@ population_death_rate = [0.012, 0.015]
 
 wrong_examination = [0, 0.1]
 
-hiv_infection_quantifier = [0.05, 0.1]
-hiv_treated_infection_quantifier = [0.01, 0.02]
+hiv_infection_quantifier = [0.05, 0.4]
+hiv_treated_infection_quantifier = [0.01, 0.4]
 
 infection_vector = [hiv_infection_quantifier, hiv_treated_infection_quantifier]
 
@@ -79,8 +79,8 @@ transition_treated_matrix_min_max = [[[0]],
                                      [[0, 0], 1, [0, hiv_treated_to_aids], [0, hiv_treated_death]],
                                      [[0, 0], [0, 0], 1, [0, aids_treated_death]]]
 
-examination = [0, 0.001]
-treating = [0, 0.002]
+examination = [0, 0.1]
+treating = [0, 0.2]
 transition_medical_matrix = [examination, treating]
 
 population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_examined, hiv_examined, hiv_treated],
@@ -91,10 +91,12 @@ medical_statuses_names = ['', 'examined', 'diagnosed', 'treated']
 
 population = Population(population_distribution)
 
-result_sequences = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
+optimum_results = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
                                      transition_medical_matrix, population_birth_rate, population_death_rate,
                                      infection_vector, wrong_examination, statistic_values,
                                      time, step, monte_carlo_iterations)
 
 time_sequence = list([i for i in range(time + 1)])
-build_plot(result_sequences[0], statistic_values, time_sequence, statuses_names, medical_statuses_names)
+print(optimum_results[1], optimum_results[2], optimum_results[3],
+      optimum_results[4], optimum_results[5], optimum_results[6])
+build_plot(optimum_results[0], statistic_values, time_sequence, statuses_names, medical_statuses_names)

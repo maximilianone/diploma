@@ -27,12 +27,20 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
                               distribution_sequences]
 
         for k in range(1, len(simulation_results)):
-            print()
-            simulation_results[k][3] *= np.array(population_sequence) / distribution_sequences[k][0]
+            for p in range(0, len(simulation_results[k])):
+                if not distribution_sequences[k][0][p] == 0:
+                    simulation_results[k][3][p] *= np.array(population_sequence[p]) / distribution_sequences[k][0][p]
+                else:
+                    simulation_results[k][3][p] = 0
 
         if i == 0:
             optimum_results.append(simulation_results)
             optimum_results.append(population_copy.transition_matrix)
+            optimum_results.append(population_copy.transition_medical_matrix)
+            optimum_results.append(population_copy.transition_treated_matrix)
+            optimum_results.append(population_copy.infection_vector)
+            optimum_results.append(population_copy.population_death_rate)
+            optimum_results.append(population_copy.population_birth_rate)
             deviation = find_deviation(statistic_values, simulation_results)
 
             print(deviation)
@@ -42,6 +50,11 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
                 deviation = iteration_deviation
                 optimum_results[0] = simulation_results
                 optimum_results[1] = population_copy.transition_matrix
+                optimum_results[2] = population_copy.transition_medical_matrix
+                optimum_results[3] = population_copy.transition_treated_matrix
+                optimum_results[4] = population_copy.infection_vector
+                optimum_results[5] = population_copy.population_death_rate
+                optimum_results[6] = population_copy.population_birth_rate
                 print(deviation)
             print(iteration_deviation)
         print(i)
@@ -83,5 +96,6 @@ def find_deviation(statistic, simulation_result):
     deviation = 0
     for i in range(len(simulation_result)):
         deviation += np.sum(
-            [a ** 2 for a in (a_row for a_row in (simulation_result[i] - statistic[i]))]) / len(simulation_result[i][0])
+            [a ** 2 for a in (a_row for a_row in (simulation_result[i] - statistic[i]))]) / (
+                                 len(simulation_result[i][0]) * len(simulation_result[i]) * len(simulation_result))
     return np.sqrt(deviation)
