@@ -7,7 +7,7 @@ from plot_builder import build_plot
 df = pd.read_excel('data_studied.xlsx', usecols=[16, 19, 25, 26, 27, 28, 30], skiprows=[0],
                    names=['hiv', 'aids', 'population', 'susceptible', 'examined', 'examined%', 'treated%'])
 
-monte_carlo_iterations = 100
+monte_carlo_iterations = 300
 
 time = 164
 step = [0, 1]
@@ -59,8 +59,8 @@ population_death_rate = [0.012, 0.015]
 
 wrong_examination = [0, 0.1]
 
-hiv_infection_quantifier = [0.05, 0.4]
-hiv_treated_infection_quantifier = [0.01, 0.4]
+hiv_infection_quantifier = [0.1, 0.5]
+hiv_treated_infection_quantifier = [0.01, 0.1]
 
 infection_vector = [hiv_infection_quantifier, hiv_treated_infection_quantifier]
 
@@ -79,8 +79,8 @@ transition_treated_matrix_min_max = [[[0]],
                                      [[0, 0], 1, [0, hiv_treated_to_aids], [0, hiv_treated_death]],
                                      [[0, 0], [0, 0], 1, [0, aids_treated_death]]]
 
-examination = [0, 0.1]
-treating = [0, 0.2]
+examination = [0, 0.001]
+treating = [0, 0.1]
 transition_medical_matrix = [examination, treating]
 
 population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_examined, hiv_examined, hiv_treated],

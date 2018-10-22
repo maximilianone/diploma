@@ -18,7 +18,8 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
         population_copy.transition_medical_matrix = get_transition_vector(transition_medical_matrix)
         population_copy.population_birth_rate = uniform(population_birth_rate[0], population_birth_rate[1])
         population_copy.population_death_rate = uniform(population_death_rate[0], population_death_rate[1])
-        population_copy.infection_vector = get_transition_vector(infection_vector)
+        vector = get_transition_vector(infection_vector)
+        population_copy.infection_vector = [[vector[0], vector[0]], [vector[1],  vector[1]]]
         population_copy.wrong_examination = uniform(wrong_examination[0], wrong_examination[1])
         population_copy.populate()
 
