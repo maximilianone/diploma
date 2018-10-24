@@ -33,15 +33,16 @@ class Population:
                     self.members.append(individual)
 
     def get_infection_probability(self):
-        infected_people = 0
-        infected_treated_people = 0
-        for i in range(1, len(self.state_distribution)):
-            infected_people += self.state_distribution[i][0]
-            infected_treated_people += self.state_distribution[i][3]
-        beta_1 = self.find_quantifier(self.infection_vector[0], infected_treated_people / infected_people)
-        beta_2 = self.find_quantifier(self.infection_vector[1], infected_treated_people / infected_people)
-        return beta_1 * (((infected_people - infected_treated_people) / len(self)) + beta_2 * (
-                    infected_treated_people / len(self)))
+        # infected_people = 0
+        # infected_treated_people = 0
+        # for i in range(1, len(self.state_distribution)):
+        #     infected_people += self.state_distribution[i][0]
+        #     infected_treated_people += self.state_distribution[i][3]
+        # beta_1 = self.find_quantifier(self.infection_vector[0], infected_treated_people / infected_people)
+        # beta_2 = self.find_quantifier(self.infection_vector[1], infected_treated_people / infected_people)
+        # return beta_1 * (((infected_people - infected_treated_people) / len(self)) + beta_2 * (
+        #             infected_treated_people / len(self)))
+        return self.infection_vector[0][0]
 
     @staticmethod
     def find_quantifier(vector, r):
