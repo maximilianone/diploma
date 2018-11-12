@@ -4,21 +4,27 @@ from population import Population
 import pandas as pd
 from plot_builder import build_plot
 
+
+def find_people_count(val, len_pop):
+    return int(np.round(val * len_pop))
+
+
 df = pd.read_excel('data_studied.xlsx', usecols=[16, 19, 25, 26, 27, 28, 30], skiprows=[0],
                    names=['hiv', 'aids', 'population', 'susceptible', 'examined', 'examined%', 'treated%'])
 
-monte_carlo_iterations = 500
+monte_carlo_iterations = 5000
 
-time = 164
+time = 152
 step = [0, 1]
 
-examined_statistic = np.array(df['examined'].values.tolist())
-treated_statistic = np.array(df['treated%'].values.tolist())
-examined_statistic_percent = np.array(df['examined%'].values.tolist())
-population_statistic = np.array(df['population'].values.tolist())
+examined_statistic = np.array(df['examined'].values.tolist()[12:])
+treated_statistic = np.array(df['treated%'].values.tolist()[12:])
+population_treated = df['treated%'].values.tolist()[:12]
+examined_statistic_percent = np.array(df['examined%'].values.tolist()[12:])
+population_statistic = np.array(df['population'].values.tolist()[12:])
 
-hiv_statistic = np.array(df['hiv'].values.tolist()) / examined_statistic
-aids_statistic = np.array(df['aids'].values.tolist()) / examined_statistic
+hiv_statistic = np.array(df['hiv'].values.tolist()[12:]) / examined_statistic
+aids_statistic = np.array(df['aids'].values.tolist()[12:]) / examined_statistic
 susceptible_statistic = 1 - hiv_statistic - aids_statistic
 
 hiv_treated_to_all = (hiv_statistic / (hiv_statistic + aids_statistic))
@@ -40,16 +46,17 @@ statistic_values = [np.array([susceptible_statistic.tolist(), susceptible_examin
                         [aids_statistic.tolist(), empty_list_aids.tolist(), aids_examined_statistic.tolist(),
                          aids_treated_statistic.tolist()])]
 
-susceptible = 9993
-hiv = 207
-aids = 14
-susceptible_examined = 439
-hiv_examined = 9
+population_count = 1024
+susceptible = find_people_count(susceptible_statistic[0], population_count)
+hiv = find_people_count(hiv_statistic[0], population_count)
+aids = find_people_count(aids_statistic[0], population_count)
+susceptible_examined = find_people_count(susceptible_examined_statistic[0], population_count)
+hiv_examined = find_people_count(hiv_examined_statistic[0], population_count)
 hiv_wrong_examined = 0
-hiv_treated = 0
-aids_examined = 1
+hiv_treated = find_people_count(hiv_treated_statistic[0], hiv)
+aids_examined = find_people_count(aids_examined_statistic[0], population_count)
 aids_wrong_examined = 0
-aids_treated = 0
+aids_treated = find_people_count(aids_treated_statistic[0], aids)
 
 # birth rate considering step duration
 population_birth_rate = [0.0005, 0.000875]
@@ -58,10 +65,10 @@ population_death_rate = [0.012, 0.015]
 
 wrong_examination = [0, 0.2]
 
-hiv_infection_quantifier = [0, 0.03]
-hiv_treated_infection_quantifier = [0.01, 1]
+beta1 = [0, 0.1]
+beta2 = [0, 20]
 
-infection_vector = [hiv_infection_quantifier, hiv_treated_infection_quantifier]
+beta_vector = [beta1, beta2]
 
 hiv_to_aids = 0.03
 aids_death = 0.03
@@ -78,7 +85,7 @@ transition_treated_matrix_min_max = [[[0]],
                                      [[0, 0], 1, [0, hiv_treated_to_aids], [0, hiv_treated_death]],
                                      [[0, 0], [0, 0], 1, [0, aids_treated_death]]]
 
-examination = [0, 0.05]
+examination = [0, 0.001]
 treating = [0, 0.3]
 transition_medical_matrix = [examination, treating]
 
@@ -89,10 +96,11 @@ statuses_names = ['susceptible', 'hiv', 'aids']
 medical_statuses_names = ['', 'examined', 'diagnosed', 'treated']
 
 population = Population(population_distribution)
+population.population_treated = population_treated
 
 optimum_results = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
                                     transition_medical_matrix, population_birth_rate, population_death_rate,
-                                    infection_vector, wrong_examination, statistic_values,
+                                    beta_vector, wrong_examination, statistic_values,
                                     time, step, monte_carlo_iterations)
 
 time_sequence = list([i for i in range(time + 1)])

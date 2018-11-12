@@ -13,7 +13,8 @@ class Population:
         self.population_birth_rate = 0
         self.population_death_rate = 0
         self.wrong_examination = 0
-        self.infection_vector = []
+        self.beta_vector = []
+        self.population_treated = []
 
     def __len__(self):
         return len(self.members)
@@ -33,19 +34,11 @@ class Population:
                     self.members.append(individual)
 
     def get_infection_probability(self):
-        # infected_people = 0
-        # infected_treated_people = 0
-        # for i in range(1, len(self.state_distribution)):
-        #     infected_people += self.state_distribution[i][0]
-        #     infected_treated_people += self.state_distribution[i][3]
-        # beta_1 = self.find_quantifier(self.infection_vector[0], infected_treated_people / infected_people)
-        # beta_2 = self.find_quantifier(self.infection_vector[1], infected_treated_people / infected_people)
-        # return beta_1 * (((infected_people - infected_treated_people) / len(self)) + beta_2 * (
-        #             infected_treated_people / len(self)))
-        return self.infection_vector[0][0]
-
-    @staticmethod
-    def find_quantifier(vector, r):
-        val = vector[len(vector) - 2] * np.exp(-vector[len(vector) - 1] * r)
-        vector.append(val)
-        return vector[len(vector) - 1]
+        infected_people = 0
+        infected_treated_people = 0
+        for i in range(1, len(self.state_distribution)):
+            infected_people += self.state_distribution[i][0]
+            infected_treated_people += self.state_distribution[i][3]
+        self.population_treated.append(infected_treated_people / infected_people if not infected_people == 0 else 0)
+        r = self.population_treated[len(self.population_treated) - 12]
+        return self.beta_vector[0] * np.exp((1 - r) * self.beta_vector[1]) * infected_people / len(self)

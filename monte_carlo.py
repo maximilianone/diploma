@@ -5,7 +5,7 @@ import copy
 
 
 def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
-                      transition_medical_matrix, population_birth_rate, population_death_rate, infection_vector,
+                      transition_medical_matrix, population_birth_rate, population_death_rate, beta_vector,
                       wrong_examination, statistic_values,
                       time, step, count):
     optimum_results = []
@@ -18,8 +18,7 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
         population_copy.transition_medical_matrix = get_transition_vector(transition_medical_matrix)
         population_copy.population_birth_rate = uniform(population_birth_rate[0], population_birth_rate[1])
         population_copy.population_death_rate = uniform(population_death_rate[0], population_death_rate[1])
-        vector = get_transition_vector(infection_vector)
-        population_copy.infection_vector = [[vector[0], vector[0]], [vector[1],  vector[1]]]
+        population_copy.beta_vector = get_transition_vector(beta_vector)
         population_copy.wrong_examination = uniform(wrong_examination[0], wrong_examination[1])
         population_copy.populate()
 
@@ -39,7 +38,7 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
             optimum_results.append(population_copy.transition_matrix)
             optimum_results.append(population_copy.transition_medical_matrix)
             optimum_results.append(population_copy.transition_treated_matrix)
-            optimum_results.append(population_copy.infection_vector)
+            optimum_results.append(population_copy.beta_vector)
             optimum_results.append(population_copy.population_death_rate)
             optimum_results.append(population_copy.population_birth_rate)
             deviation = find_deviation(statistic_values, simulation_results)
@@ -53,7 +52,7 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
                 optimum_results[1] = population_copy.transition_matrix
                 optimum_results[2] = population_copy.transition_medical_matrix
                 optimum_results[3] = population_copy.transition_treated_matrix
-                optimum_results[4] = population_copy.infection_vector
+                optimum_results[4] = population_copy.beta_vector
                 optimum_results[5] = population_copy.population_death_rate
                 optimum_results[6] = population_copy.population_birth_rate
                 print(deviation)
@@ -95,8 +94,8 @@ def get_transition_vector(transition_vector_min_max):
 
 def find_deviation(statistic, simulation_result):
     deviation = 0
-    for i in range(len(simulation_result)):
+    for i in range(1, len(simulation_result)):
         deviation += np.sum(
             [a ** 2 for a in (a_row for a_row in (simulation_result[i] - statistic[i]))]) / (
-                                 len(simulation_result[i][0]) * len(simulation_result[i]) * len(simulation_result))
+                                 len(simulation_result[i][0]) * len(simulation_result[i]))
     return np.sqrt(deviation)
