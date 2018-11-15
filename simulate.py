@@ -63,19 +63,22 @@ def death(individual, population):
 
 
 def infect(population, individual, step):
-    infected_people = np.random.poisson(individual.get_average_infected_people() / (12 / (step[1] + 12 * step[0])))
-    for agent in population.members:
-        if infected_people == 0:
-            break
-        if agent.state == 0:
-            agent.state = 1
-            population.state_distribution[0][agent.medical_state] -= 1
-            if not agent.medical_state == 0:
-                population.state_distribution[0][0] -= 1
-            population.state_distribution[1][agent.medical_state] += 1
-            if not agent.medical_state == 0:
-                population.state_distribution[1][0] += 1
-            infected_people -= 1
+    if not individual.state == 0:
+        infected_people = np.random.poisson(
+            individual.get_average_infected_people(population.average_infected_vector) / (
+                        12 / (step[1] + 12 * step[0])))
+        for agent in population.members:
+            if infected_people == 0:
+                break
+            if agent.state == 0:
+                agent.state = 1
+                population.state_distribution[0][agent.medical_state] -= 1
+                if not agent.medical_state == 0:
+                    population.state_distribution[0][0] -= 1
+                population.state_distribution[1][agent.medical_state] += 1
+                if not agent.medical_state == 0:
+                    population.state_distribution[1][0] += 1
+                infected_people -= 1
 
 
 def prepare_population_count(count):

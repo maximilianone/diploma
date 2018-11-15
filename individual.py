@@ -27,5 +27,10 @@ class Individual:
     def set_lifespan(self, life_expectancy):
         self.lifespan = [int(np.round(life_expectancy * (-np.log(random())) ** 0.3)), randint(0, 11)]
 
-    def get_average_infected_people(self):
-        return self.age[0]
+    def get_average_infected_people(self, average_infected_vector):
+        a = average_infected_vector[0] if not self.medical_state == 3 else average_infected_vector[1]
+        return self.gaussian(a, 35, 10, self.age[0])
+
+    @staticmethod
+    def gaussian(a, b, c, x):
+        return a * np.exp(-((x - b) ** 2) / (2 * c ** 2))

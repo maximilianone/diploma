@@ -12,7 +12,7 @@ def find_people_count(val, len_pop):
 df = pd.read_excel('data_studied.xlsx', usecols=[16, 19, 25, 26, 27, 28, 30], skiprows=[0],
                    names=['hiv', 'aids', 'population', 'susceptible', 'examined', 'examined%', 'treated%'])
 
-monte_carlo_iterations = 5000
+monte_carlo_iterations = 1000
 
 time = 152
 step = [0, 1]
@@ -65,10 +65,10 @@ population_death_rate = [0.012, 0.015]
 
 wrong_examination = [0, 0.2]
 
-beta1 = [0, 0.1]
-beta2 = [0, 20]
+average_infected = [0, 2]
+average_treated_infected = [0, 1]
 
-beta_vector = [beta1, beta2]
+average_infected_vector = [average_infected, average_treated_infected]
 
 hiv_to_aids = 0.03
 aids_death = 0.03
@@ -100,7 +100,7 @@ population.population_treated = population_treated
 
 optimum_results = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
                                     transition_medical_matrix, population_birth_rate, population_death_rate,
-                                    beta_vector, wrong_examination, statistic_values,
+                                    average_infected_vector, wrong_examination, statistic_values,
                                     time, step, monte_carlo_iterations)
 
 time_sequence = list([i for i in range(time + 1)])

@@ -13,7 +13,7 @@ class Population:
         self.population_birth_rate = 0
         self.population_death_rate = 0
         self.wrong_examination = 0
-        self.beta_vector = []
+        self.average_infected_vector = []
         self.population_treated = []
 
     def __len__(self):
@@ -32,13 +32,3 @@ class Population:
                     individual.set_lifespan(int(np.round(1 / self.population_death_rate)))
                     individual.set_age()
                     self.members.append(individual)
-
-    def get_infection_probability(self):
-        infected_people = 0
-        infected_treated_people = 0
-        for i in range(1, len(self.state_distribution)):
-            infected_people += self.state_distribution[i][0]
-            infected_treated_people += self.state_distribution[i][3]
-        self.population_treated.append(infected_treated_people / infected_people if not infected_people == 0 else 0)
-        r = self.population_treated[len(self.population_treated) - 12]
-        return self.beta_vector[0] * np.exp((1 - r) * self.beta_vector[1]) * infected_people / len(self)
