@@ -1,12 +1,22 @@
-from individual import Individual
+import matplotlib.pyplot as plt
 from random import *
 import numpy as np
 
-deviation = 0
-simulation_result = np.array([[[1, 2, 3], [0, 1, 2], [7, 3, 1]], [[1, 2, 3], [0, 1, 2], [7, 3, 1]]])
-statistic = np.array([[[2, 3, 4], [1, 2, 3], [8, 4, 2]], [[2, 3, 4], [1, 2, 3], [8, 4, 2]]])
-for i in range(len(simulation_result)):
-    print(np.sum([a ** 2 for a in (a_row for a_row in (simulation_result[i] - statistic[i]))])/ (len(simulation_result[i][0]) * len(simulation_result[i]) * len(simulation_result)))
-    deviation += np.sum(
-        [a ** 2 for a in (a_row for a_row in (simulation_result[i] - statistic[i]))]) / (len(simulation_result[i][0]) * len(simulation_result[i]) * len(simulation_result))
-print(np.sqrt(deviation))
+time = 12
+x = list([i for i in range(time)])
+
+
+def poisson(k, l):
+    return np.exp(-l) * (l ** k) / np.math.factorial(k)
+
+
+y = []
+for i in range(time):
+    y.append(poisson(i, 4))
+
+count = 0
+
+for moment in range(time):
+    count += np.random.poisson(2/12)
+
+print(count)

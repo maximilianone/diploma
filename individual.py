@@ -26,3 +26,6 @@ class Individual:
 
     def set_lifespan(self, life_expectancy):
         self.lifespan = [int(np.round(life_expectancy * (-np.log(random())) ** 0.3)), randint(0, 11)]
+
+    def get_average_infected_people(self):
+        return self.age[0]
