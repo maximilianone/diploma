@@ -85,7 +85,7 @@ transition_treated_matrix_min_max = [[[0]],
                                      [[0, 0], 1, [0, hiv_treated_to_aids], [0, hiv_treated_death]],
                                      [[0, 0], [0, 0], 1, [0, aids_treated_death]]]
 
-examination = [0, 0.001]
+examination = [0, 0.01]
 treating = [0, 0.3]
 transition_medical_matrix = [examination, treating]
 

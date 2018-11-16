@@ -101,7 +101,7 @@ def get_int_vector(vector_min_max):
 
 def find_deviation(statistic, simulation_result):
     deviation = 0
-    for i in range(1, len(simulation_result)):
+    for i in range(len(simulation_result)):
         deviation += np.sum(
             [a ** 2 for a in (a_row for a_row in (simulation_result[i] - statistic[i]))]) / (
                                  len(simulation_result[i][0]) * len(simulation_result[i]))
