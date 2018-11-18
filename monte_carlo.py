@@ -7,7 +7,7 @@ import copy
 def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
                       transition_medical_matrix, population_birth_rate, population_death_rate, average_infected_vector,
                       wrong_examination, statistic_values,
-                      time, step, count):
+                      time, step, count, values_to_statistic):
     optimum_results = []
     deviation = 0
 
@@ -23,15 +23,7 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
         population_copy.populate()
 
         distribution_sequences, population_sequence = simulate(time, step, population_copy)
-        simulation_results = [np.array(state_list) / np.array(population_sequence) for state_list in
-                              distribution_sequences]
-
-        for k in range(1, len(simulation_results)):
-            for p in range(0, len(simulation_results[k])):
-                if not distribution_sequences[k][0][p] == 0:
-                    simulation_results[k][3][p] *= np.array(population_sequence[p]) / distribution_sequences[k][0][p]
-                else:
-                    simulation_results[k][3][p] = 0
+        simulation_results = values_to_statistic(distribution_sequences, population_sequence)
 
         if i == 0:
             optimum_results.append(simulation_results)
@@ -102,7 +94,5 @@ def get_int_vector(vector_min_max):
 def find_deviation(statistic, simulation_result):
     deviation = 0
     for i in range(len(simulation_result)):
-        deviation += np.sum(
-            [a ** 2 for a in (a_row for a_row in (simulation_result[i] - statistic[i]))]) / (
-                                 len(simulation_result[i][0]) * len(simulation_result[i]))
+        deviation += np.sum([a ** 2 for a in (simulation_result[i] - statistic[i])]) / (len(simulation_result[i]))
     return np.sqrt(deviation)

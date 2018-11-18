@@ -57,6 +57,8 @@ def death(individual, population):
         population.state_distribution[individual.state][individual.medical_state] -= 1
         if not individual.medical_state == 0:
             population.state_distribution[individual.state][0] -= 1
+        if individual.medical_state == 3:
+            population.state_distribution[individual.state][2] -= 1
         population.members.remove(individual)
         is_dead = True
     return is_dead
@@ -99,6 +101,8 @@ def change_state_with_matrix(population, individual, transition_matrix):
             population.state_distribution[individual.state][individual.medical_state] -= 1
             if not individual.medical_state == 0:
                 population.state_distribution[individual.state][0] -= 1
+            if individual.medical_state == 3:
+                population.state_distribution[individual.state][2] -= 1
             if i == len(transition_matrix[individual.state]) - 1:
                 population.members.remove(individual)
             else:
@@ -106,6 +110,8 @@ def change_state_with_matrix(population, individual, transition_matrix):
                 population.state_distribution[individual.state][individual.medical_state] += 1
                 if not individual.medical_state == 0:
                     population.state_distribution[individual.state][0] += 1
+                if individual.medical_state == 3:
+                    population.state_distribution[individual.state][2] += 1
 
 
 def change_medical_state(population, individual, transition_matrix):
@@ -121,7 +127,6 @@ def change_medical_state(population, individual, transition_matrix):
                 individual.medical_state = 2
                 population.state_distribution[individual.state][individual.medical_state] += 1
     elif individual.medical_state == 2 and transition_matrix[1] >= rand:
-        population.state_distribution[individual.state][individual.medical_state] -= 1
         individual.medical_state = 3
         population.state_distribution[individual.state][individual.medical_state] += 1
 
