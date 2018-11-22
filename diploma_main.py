@@ -5,17 +5,14 @@ import pandas as pd
 from plot_builder import build_plot
 
 
-def values_to_statistic(status_distribution_sequences, population_sequence):
+def values_to_statistic(status_distribution_sequences):
     infected = np.array(status_distribution_sequences[1][0]) + np.array(status_distribution_sequences[2][0])
     examined = np.array(status_distribution_sequences[1][2]) + np.array(status_distribution_sequences[2][2])
     treated = np.array(status_distribution_sequences[1][3]) + np.array(status_distribution_sequences[2][3])
-    treated_percent = []
-    for i in range(len(examined)):
-        treated_percent.append(treated[i] / examined[i] if not examined[i] == 0 else 0)
-    result = [(np.array(status_distribution_sequences[0][0]) + infected - examined) / np.array(population_sequence),
-              (np.array(status_distribution_sequences[1][2])) / np.array(population_sequence),
-              (np.array(status_distribution_sequences[2][2])) / np.array(population_sequence),
-              np.array(treated_percent)]
+    result = [np.array(status_distribution_sequences[0][0]) + infected - examined,
+              np.array(status_distribution_sequences[1][2]),
+              np.array(status_distribution_sequences[2][2]),
+              np.array(treated)]
     return result
 
 
@@ -27,36 +24,39 @@ monte_carlo_iterations = 10
 time = 152
 step = [0, 1]
 
-population_statistic = df['population'].values.tolist()[12:]
-susceptible_statistic = df['susceptible'].values.tolist()[12:]
-treated_statistic = df['treated%'].values.tolist()[12:]
+population_statistic = np.array(df['population'].values.tolist()[12:])
+susceptible_statistic = np.array(df['susceptible'].values.tolist()[12:])
+treated_statistic = np.array(df['treated%'].values.tolist()[12:])
 population_treated = df['treated%'].values.tolist()[:12]
-hiv_statistic = df['hiv'].values.tolist()[12:]
-aids_statistic = df['aids'].values.tolist()[12:]
+hiv_statistic = np.array(df['hiv'].values.tolist()[12:])
+aids_statistic = np.array(df['aids'].values.tolist()[12:])
 
-statistic_values = [np.array(susceptible_statistic) / np.array(population_statistic),
-                    np.array(hiv_statistic) / np.array(population_statistic),
-                    np.array(aids_statistic) / np.array(population_statistic),
-                    np.array(treated_statistic)]
+treated_statistic = np.array([int(np.round(i)) for i in (treated_statistic * hiv_statistic + aids_statistic)])
 
-population_count = 1000
-susceptible = 976
-hiv = 22
-aids = 2
-susceptible_examined = 46
-hiv_examined = 1
+quantifier = 5
+agents = 1000 * quantifier
+delimiter = population_statistic[0] / agents
+
+statistic_values = [np.array([int(np.round(i / delimiter)) for i in susceptible_statistic]),
+                    np.array([int(np.round(i / delimiter)) for i in hiv_statistic]),
+                    np.array([int(np.round(i / delimiter)) for i in aids_statistic]),
+                    np.array([int(np.round(i / delimiter)) for i in treated_statistic])]
+
+
+susceptible = 976 * quantifier
+hiv = 22 * quantifier
+aids = 2 * quantifier
+susceptible_examined = 46 * quantifier
+hiv_examined = 1 * quantifier
 hiv_wrong_examined = 0
 hiv_treated = 0
 aids_examined = 0
 aids_wrong_examined = 0
 aids_treated = 0
 
-# birth rate considering step duration
-population_birth_rate = [0.0005, 0.000875]
-# year death rate
-population_death_rate = [0.012, 0.015]
+population_death_rate = [0, 0.000015]
 
-wrong_examination = [0, 0.2]
+wrong_examination = [0, 0]
 
 average_infected = [0, 2]
 average_treated_infected = [0, 1]
@@ -91,7 +91,7 @@ population = Population(population_distribution)
 population.population_treated = population_treated
 
 optimum_results = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
-                                    transition_medical_matrix, population_birth_rate, population_death_rate,
+                                    transition_medical_matrix, population_death_rate,
                                     average_infected_vector, wrong_examination, statistic_values,
                                     time, step, monte_carlo_iterations, values_to_statistic)
 

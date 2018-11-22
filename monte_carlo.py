@@ -5,7 +5,7 @@ import copy
 
 
 def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
-                      transition_medical_matrix, population_birth_rate, population_death_rate, average_infected_vector,
+                      transition_medical_matrix, population_death_rate, average_infected_vector,
                       wrong_examination, statistic_values,
                       time, step, count, values_to_statistic):
     optimum_results = []
@@ -16,14 +16,13 @@ def monte_carlo_apply(population, transition_matrix_min_max, transition_treated_
         population_copy.transition_matrix = get_transition_matrix(transition_matrix_min_max)
         population_copy.transition_treated_matrix = get_transition_matrix(transition_treated_matrix_min_max)
         population_copy.transition_medical_matrix = get_transition_vector(transition_medical_matrix)
-        population_copy.population_birth_rate = uniform(population_birth_rate[0], population_birth_rate[1])
         population_copy.population_death_rate = uniform(population_death_rate[0], population_death_rate[1])
         population_copy.average_infected_vector = get_int_vector(average_infected_vector)
         population_copy.wrong_examination = uniform(wrong_examination[0], wrong_examination[1])
         population_copy.populate()
 
         distribution_sequences, population_sequence = simulate(time, step, population_copy)
-        simulation_results = values_to_statistic(distribution_sequences, population_sequence)
+        simulation_results = values_to_statistic(distribution_sequences)
 
         if i == 0:
             optimum_results.append(simulation_results)

@@ -10,15 +10,11 @@ def simulate(time, step, population):
     population_sequence = [len(population)]
 
     for i in range(time):
-        born(population)
+        death(population)
 
         for individual in population.members:
-            if death(individual, population):
-                continue
-
             infect(population, individual, step)
 
-            individual.age = increment_time(individual.age, step)
             if individual.medical_state == 1:
                 individual.last_examination_count = increment_time(individual.last_examination_count, step)
 
@@ -40,35 +36,23 @@ def increment_time(time, step):
     return time
 
 
-def born(population):
-    new_individuals_count = prepare_population_count(uniform(0, 2) *
-                                                     len(population) * population.population_birth_rate)
-    for i in range(new_individuals_count):
-        individual = Individual(0, 0, [0, 0])
-        individual.set_lifespan(prepare_population_count(1 / population.population_death_rate))
-        population.members.append(individual)
-        population.state_distribution[0][0] += 1
-
-
-def death(individual, population):
-    is_dead = False
-    if individual.age[0] > individual.lifespan[0] or (
-            individual.age[0] == individual.lifespan[0] and individual.age[1] > individual.lifespan[1]):
+def death(population):
+    dead = prepare_population_count(len(population) * population.population_death_rate)
+    for i in range(dead):
+        individual = population.members[randint(0, len(population) - 1)]
         population.state_distribution[individual.state][individual.medical_state] -= 1
         if not individual.medical_state == 0:
             population.state_distribution[individual.state][0] -= 1
         if individual.medical_state == 3:
             population.state_distribution[individual.state][2] -= 1
         population.members.remove(individual)
-        is_dead = True
-    return is_dead
 
 
 def infect(population, individual, step):
     if not individual.state == 0:
-        infected_people = np.random.poisson(
-            individual.get_average_infected_people(population.average_infected_vector) / (
-                        12 / (step[1] + 12 * step[0])))
+        inf, inf_tr = population.average_infected_vector[0], population.average_infected_vector[1]
+        average = inf if not individual.medical_state == 3 else inf_tr
+        infected_people = np.random.poisson(average / (12 / (step[1] + 12 * step[0])))
         for agent in population.members:
             if infected_people == 0:
                 break
