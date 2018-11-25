@@ -1,6 +1,5 @@
 import numpy as np
 from random import *
-from individual import Individual
 
 
 def simulate(time, step, population):
@@ -53,6 +52,8 @@ def infect(population, individual, step):
         inf, inf_tr = population.average_infected_vector[0], population.average_infected_vector[1]
         average = inf if not individual.medical_state == 3 else inf_tr
         infected_people = np.random.poisson(average / (12 / (step[1] + 12 * step[0])))
+        if average > 0:
+            pass
         for agent in population.members:
             if infected_people == 0:
                 break
@@ -101,7 +102,7 @@ def change_state_with_matrix(population, individual, transition_matrix):
 def change_medical_state(population, individual, transition_matrix):
     rand = uniform(0, 1)
     if individual.medical_state <= 1:
-        if individual.get_examination_probability(transition_matrix[0]) >= uniform(0, 1):
+        if individual.get_examination_probability(transition_matrix[0][0]) >= uniform(0, 1):
             individual.last_examination_count = [0, 0]
             if individual.medical_state == 0:
                 individual.medical_state = 1
@@ -110,9 +111,11 @@ def change_medical_state(population, individual, transition_matrix):
                 population.state_distribution[individual.state][individual.medical_state] -= 1
                 individual.medical_state = 2
                 population.state_distribution[individual.state][individual.medical_state] += 1
-    elif individual.medical_state == 2 and transition_matrix[1] >= rand:
-        individual.medical_state = 3
-        population.state_distribution[individual.state][individual.medical_state] += 1
+    elif individual.medical_state == 2:
+        if (individual.state == 1 and transition_matrix[1][0] >= rand) or (
+                individual.state == 2 and transition_matrix[1][1] >= rand):
+            individual.medical_state = 3
+            population.state_distribution[individual.state][individual.medical_state] += 1
 
 
 def markov_transition(rand, transition_probability_vector, transition_number):

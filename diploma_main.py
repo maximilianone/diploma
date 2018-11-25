@@ -19,19 +19,19 @@ def values_to_statistic(status_distribution_sequences):
 df = pd.read_excel('data_studied.xlsx', usecols=[16, 19, 25, 26, 27, 28, 30], skiprows=[0],
                    names=['hiv', 'aids', 'population', 'susceptible', 'examined', 'examined%', 'treated%'])
 
-monte_carlo_iterations = 10
+monte_carlo_iterations = 500
 
-time = 152
+time = 144
 step = [0, 1]
 
-population_statistic = np.array(df['population'].values.tolist()[12:])
-susceptible_statistic = np.array(df['susceptible'].values.tolist()[12:])
-treated_statistic = np.array(df['treated%'].values.tolist()[12:])
+population_statistic = np.array(df['population'].values.tolist()[12:157])
+susceptible_statistic = np.array(df['susceptible'].values.tolist()[12:157])
+treated_statistic = np.array(df['treated%'].values.tolist()[12:157])
 population_treated = df['treated%'].values.tolist()[:12]
-hiv_statistic = np.array(df['hiv'].values.tolist()[12:])
-aids_statistic = np.array(df['aids'].values.tolist()[12:])
+hiv_statistic = np.array(df['hiv'].values.tolist()[12:157])
+aids_statistic = np.array(df['aids'].values.tolist()[12:157])
 
-treated_statistic = np.array([int(np.round(i)) for i in (treated_statistic * hiv_statistic + aids_statistic)])
+treated_statistic = np.array([int(np.round(i)) for i in (treated_statistic * (hiv_statistic + aids_statistic))])
 
 quantifier = 5
 agents = 1000 * quantifier
@@ -54,16 +54,16 @@ aids_examined = 0
 aids_wrong_examined = 0
 aids_treated = 0
 
-population_death_rate = [0, 0.000015]
+population_death_rate = [0.0000005, 0.000005]
 
 wrong_examination = [0, 0]
 
-average_infected = [0, 2]
-average_treated_infected = [0, 1]
+average_infected = [0.15, 0.35]
+average_treated_infected = [0.01, 0.04]
 
 average_infected_vector = [average_infected, average_treated_infected]
 
-hiv_to_aids = 0.03
+hiv_to_aids = [0.021, 0.025]
 aids_death = 0.03
 hiv_death = 0.01
 hiv_treated_to_aids = 0.003
@@ -71,21 +71,22 @@ hiv_treated_death = 0.001
 aids_treated_death = 0.004
 
 transition_matrix_min_max = [[1, [0, 0], [0, 0], [0, 0]],
-                             [[0, 0], 1, [0, hiv_to_aids], [0, hiv_death]],
+                             [[0, 0], 1, hiv_to_aids, [0, hiv_death]],
                              [[0, 0], [0, 0], 1, [0, aids_death]]]
 
 transition_treated_matrix_min_max = [[[0]],
                                      [[0, 0], 1, [0, hiv_treated_to_aids], [0, hiv_treated_death]],
                                      [[0, 0], [0, 0], 1, [0, aids_treated_death]]]
 
-examination = [0, 0.01]
-treating = [0, 0.01]
-transition_medical_matrix = [examination, treating]
+examination = [0.001, 0.01]
+treating_hiv = [0.002, 0.005]
+treating_aids = [0.02, 0.05]
+transition_medical_matrix = [[examination], [treating_hiv, treating_aids]]
 
 population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_examined, hiv_examined, hiv_treated],
                            [aids, aids_wrong_examined, aids_examined, aids_treated]]
 
-names = ['susceptible', 'hiv', 'aids', 'examined']
+names = ['susceptible', 'hiv', 'aids', 'treated']
 
 population = Population(population_distribution)
 population.population_treated = population_treated
@@ -97,5 +98,5 @@ optimum_results = monte_carlo_apply(population, transition_matrix_min_max, trans
 
 time_sequence = list([i for i in range(time + 1)])
 print(optimum_results[1], optimum_results[2], optimum_results[3],
-      optimum_results[4], optimum_results[5], optimum_results[6])
+      optimum_results[4], optimum_results[5])
 build_plot(optimum_results[0], statistic_values, time_sequence, names)

@@ -10,7 +10,6 @@ class Population:
         self.transition_treated_matrix = []
         self.transition_medical_matrix = []
         self.members = []
-        self.population_birth_rate = 0
         self.population_death_rate = 0
         self.wrong_examination = 0
         self.average_infected_vector = []
