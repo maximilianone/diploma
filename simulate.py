@@ -52,8 +52,6 @@ def infect(population, individual, step):
         inf, inf_tr = population.average_infected_vector[0], population.average_infected_vector[1]
         average = inf if not individual.medical_state == 3 else inf_tr
         infected_people = np.random.poisson(average / (12 / (step[1] + 12 * step[0])))
-        if average > 0:
-            pass
         for agent in population.members:
             if infected_people == 0:
                 break

@@ -87,5 +87,5 @@ def find_deviation(statistic, simulation_result):
     for i in range(len(simulation_result)):
         deviation += np.sum([a ** 2 for a in (simulation_result[i] - statistic[i])]) / (len(simulation_result[i]))
         if i == 0:
-            deviation /= 100
+            deviation /= 10
     return np.sqrt(deviation)
