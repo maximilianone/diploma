@@ -46,7 +46,7 @@ susceptible_examined = 46 * quantifier
 hiv_examined = 1 * quantifier
 hiv_wrong_examined = 0
 hiv_treated = 0
-aids_examined = 2
+aids_examined = 1
 aids_wrong_examined = 0
 aids_treated = 0
 
@@ -56,13 +56,13 @@ population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_
 population = Population(population_distribution)
 population.population_treated = population_treated
 population.transition_matrix = [[1.0, 0.0, 0.0, 0.0],
-                                [0.0, 0.993127610306856, 0.005793699432760308, 0.0010786902603837061],
-                                [0.0, 0.0, 0.9941233226771411, 0.005876677322858956]]
-population.transition_treated_matrix = [[1], [0.0, 0.9998330154088951, 0.00016361910077234633, 3.3654903324941644e-06],
-                                        [0.0, 0.0, 0.9999740079580219, 2.5992041978020294e-05]]
-population.transition_medical_matrix = [[0.00309876971845901], [0.0022893188245755166, 0.03803177478377469]]
-population.population_death_rate = 0.0004818770463706198
-population.average_infected_vector = [0.03088048550225484, 0.001477381928906738]
+                                [0.0, 0.993895336731776, 0.004900325949233125, 0.0012043373189908274],
+                                [0.0, 0.0, 0.9949829545143906, 0.005017045485609444]]
+population.transition_treated_matrix = [[1], [0.0, 0.9999265919813641, 7.196470280814807e-05, 1.443315827697732e-06],
+                                        [0.0, 0.0, 0.9999977350989598, 2.2649010401869064e-06]]
+population.transition_medical_matrix = [[0.0023601937167775734], [0.00186468954542118, 0.0263742426647091]]
+population.population_death_rate = 0.0004619560712723398
+population.average_infected_vector = [0.018162747716319577, 0.0017622648234252702]
 population.wrong_examination = 0
 population.populate()
 
