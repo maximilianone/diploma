@@ -88,6 +88,7 @@ def change_state_with_matrix(population, individual, transition_matrix):
                 population.state_distribution[individual.state][2] -= 1
             if i == len(transition_matrix[individual.state]) - 1:
                 population.members.remove(individual)
+                population.infected_dead += 1
             else:
                 individual.state = i
                 population.state_distribution[individual.state][individual.medical_state] += 1

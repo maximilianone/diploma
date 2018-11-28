@@ -13,7 +13,7 @@ class Population:
         self.population_death_rate = 0
         self.wrong_examination = 0
         self.average_infected_vector = []
-        self.population_treated = []
+        self.infected_dead = 0
 
     def __len__(self):
         return len(self.members)

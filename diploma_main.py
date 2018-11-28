@@ -89,7 +89,6 @@ population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_
 names = ['susceptible', 'hiv', 'aids', 'treated']
 
 population = Population(population_distribution)
-population.population_treated = population_treated
 
 optimum_results = monte_carlo_apply(population, transition_matrix_min_max, transition_treated_matrix_min_max,
                                     transition_medical_matrix, population_death_rate,
