@@ -2,6 +2,7 @@ from simulate import simulate
 import numpy as np
 import copy
 from population import Population
+import matplotlib.pyplot as plt
 
 
 time = 144
@@ -38,10 +39,17 @@ population.populate()
 
 
 def optimize(time, step, population):
-    for i in range(10):
+    time_list = list([i for i in range(100)])
+    optimize_list = []
+    for i in range(100):
         population_copy = copy.deepcopy(population)
+        population_copy.transition_medical_matrix[0][0] += 0.001 * i
         simulate(time, step, population_copy)
+        optimize_list.append(population_copy.infected_dead)
         print(population_copy.infected_dead)
+    plt.grid(True)
+    plt.plot(time_list, optimize_list)
+    plt.show()
 
 
 optimize(time, step, population)
