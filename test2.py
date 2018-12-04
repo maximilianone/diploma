@@ -28,7 +28,7 @@ treated_statistic = np.array(df['treated%'].values.tolist()[12:157])
 population_treated = df['treated%'].values.tolist()[:12]
 hiv_statistic = np.array(df['hiv'].values.tolist()[12:157])
 aids_statistic = np.array(df['aids'].values.tolist()[12:157])
-quantifier = 20
+quantifier = 10
 agents = 1000 * quantifier
 delimiter = population_statistic[0] / agents
 
@@ -55,22 +55,26 @@ population_distribution = [[susceptible, susceptible_examined], [hiv, hiv_wrong_
 
 population = Population(population_distribution)
 population.transition_matrix = [[1.0, 0.0, 0.0, 0.0],
-                                [0.0, 0.993895336731776, 0.004900325949233125, 0.0012043373189908274],
-                                [0.0, 0.0, 0.9949829545143906, 0.005017045485609444]]
+                                [0.0, 0.99697924031886779226, 0.002900325949233125, 0.00012043373189908274],
+                                [0.0, 0.0, 0.997982954514390556, 0.002017045485609444]]
 population.transition_treated_matrix = [[1], [0.0, 0.9999265919813641, 7.196470280814807e-05, 1.443315827697732e-06],
                                         [0.0, 0.0, 0.9999977350989598, 2.2649010401869064e-06]]
-population.transition_medical_matrix = [[0.0023601937167775734], [0.00186468954542118, 0.0263742426647091]]
-population.population_death_rate = 0.0004619560712723398
-population.average_infected_vector = [0.018162747716319577, 0.0017622648234252702]
+population.transition_medical_matrix = [[0.00083601937167775734], [0.00186468954542118, 0.0263742426647091]]
+population.population_death_rate = 0.0004219560712723398
+population.average_infected_vector = [0.14162747716319577, 0.017622648234252702]
 population.wrong_examination = 0
 population.populate()
 
-names = ['susceptible', 'hiv', 'aids', 'treated']
+names = ['Здорові (вразливі)', 'ВІЧ-інфіковані', 'хворі на СПІД', 'Отримуючі АРТ']
 time_sequence = list([i for i in range(time + 1)])
 
 
 def optimize(time, step, population):
     distribution_sequences, population_sequence = simulate(time, step, population)
+    print(population.infected_dead)
+    print(population.state_distribution[0][1] + population.state_distribution[1][1] + \
+          population.state_distribution[2][1] + population.state_distribution[1][2] + \
+          population.state_distribution[2][2])
     return values_to_statistic(distribution_sequences)
 
 

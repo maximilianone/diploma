@@ -14,6 +14,7 @@ class Population:
         self.wrong_examination = 0
         self.average_infected_vector = []
         self.infected_dead = 0
+        self.year_examined = 0
 
     def __len__(self):
         return len(self.members)

@@ -9,6 +9,10 @@ def simulate(time, step, population):
     population_sequence = [len(population)]
 
     for i in range(time):
+        if i == 12:
+            population.year_examined = population.state_distribution[0][1] + population.state_distribution[1][1] + \
+                                       population.state_distribution[2][1] + population.state_distribution[1][2] + \
+                                       population.state_distribution[2][2]
         death(population)
 
         for individual in population.members:
