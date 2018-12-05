@@ -1,55 +1,48 @@
-import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib.ticker import PercentFormatter
 import numpy as np
 
 df = pd.read_excel('BD2.xlsx', usecols=[1, 6, 27, 28, 29, 30], skiprows=[0, 1],
                    names=['ВІК', 'ВПЛ', 'CIN1', 'CIN2', 'CIN3', 'CC'])
 
-HPV = df[['ВІК', 'ВПЛ']]
-HPV = HPV[HPV['ВПЛ'] != 'ні']
-CIN1 = df[['ВІК', 'CIN1']].dropna()
-CIN2 = df[['ВІК', 'CIN2']].dropna()
-CIN3 = df[['ВІК', 'CIN3']].dropna()
-CC = df[['ВІК', 'CC']].dropna()
-labels = 'ВПЛ', 'CIN1', 'CIN1',  'Вразливі', 'CC'
+VPL = df['ВПЛ'].replace('так', 1).replace('ні', 0)
+vpl = VPL.tolist()
+CIN = df[['CIN1', 'CIN2', 'CIN3']].replace('так', 1).fillna(0)
+cin = CIN.values
 
-fig1, ax1 = plt.subplots()
-ax1.hist(HPV['ВІК'].tolist(), 20, weights=np.ones(len(HPV['ВІК'].tolist())) / len(HPV['ВІК'].tolist()))
+AGE = df['ВІК']
+age = AGE.tolist()
 
-plt.xlabel('Вік, рік')
-plt.ylabel('Відсоток, %')
-plt.gca().yaxis.set_major_formatter(PercentFormatter(1))
-plt.show()
+clusters = []
+counter = 0
+for i in range(len(age)):
+    if counter < 10 or age[i] == age[i-1]:
+        counter += 1
+    else:
+        clusters.append(i)
+        counter = 0
+clusters[len(clusters) - 1] = len(age)
 
-fig1, ax1 = plt.subplots()
-ax1.hist(CIN1['ВІК'].tolist(), 20, weights=np.ones(len(CIN1['ВІК'].tolist())) / len(CIN1['ВІК'].tolist()))
+vpl_clusters_parts = []
+for i in range(len(clusters)):
+    if i == 0:
+        vpl_part = np.sum(vpl[0: clusters[i]]) / clusters[i]
+    else:
+        vpl_part = np.sum(vpl[clusters[i - 1]: clusters[i]]) / (clusters[i] - clusters[i - 1])
+    vpl_clusters_parts.append([1 - vpl_part, vpl_part])
 
-plt.xlabel('Вік, рік')
-plt.ylabel('Відсоток, %')
-plt.gca().yaxis.set_major_formatter(PercentFormatter(1))
-plt.show()
-
-fig1, ax1 = plt.subplots()
-ax1.hist(CIN2['ВІК'].tolist(), 20, weights=np.ones(len(CIN2['ВІК'].tolist())) / len(CIN2['ВІК'].tolist()))
-
-plt.xlabel('Вік, рік')
-plt.ylabel('Відсоток, %')
-plt.gca().yaxis.set_major_formatter(PercentFormatter(1))
-plt.show()
-
-fig1, ax1 = plt.subplots()
-ax1.hist(CIN3['ВІК'].tolist(), 20, weights=np.ones(len(CIN3['ВІК'].tolist())) / len(CIN3['ВІК'].tolist()))
-
-plt.xlabel('Вік, рік')
-plt.ylabel('Відсоток, %')
-plt.gca().yaxis.set_major_formatter(PercentFormatter(1))
-plt.show()
-
-fig1, ax1 = plt.subplots()
-ax1.hist(CC['ВІК'].tolist(), 20, weights=np.ones(len(CC['ВІК'].tolist())) / len(CC['ВІК'].tolist()))
-
-plt.xlabel('Вік, рік')
-plt.ylabel('Відсоток, %')
-plt.gca().yaxis.set_major_formatter(PercentFormatter(1))
-plt.show()
+print(vpl_clusters_parts)
+parameter_matrix = []
+target_matrix = []
+for i in range(len(vpl_clusters_parts) - 1):
+    parameter_matrix.append(vpl_clusters_parts[i])
+    target_matrix.append(vpl_clusters_parts[i + 1])
+parameter_matrix = np.matrix(parameter_matrix)
+target_matrix = np.matrix(target_matrix)
+transport_matrix = np.linalg.lstsq(parameter_matrix, target_matrix, rcond=None)[0]
+print(transport_matrix)
+deviation = 0
+for i in range(len(vpl_clusters_parts) - 1):
+    test = np.matrix(vpl_clusters_parts[i]) * transport_matrix
+    print(np.sqrt(np.sum([a**2 for a in (np.asarray(test) - np.array(vpl_clusters_parts[i+1]))]) / 2), vpl_clusters_parts[i+1], test)
+    deviation += np.sqrt(np.sum([a**2 for a in (np.asarray(test) - np.array(vpl_clusters_parts[i+1]))]) / 2)
+print(deviation / (len(vpl_clusters_parts) - 1))
