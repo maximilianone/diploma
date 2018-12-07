@@ -44,14 +44,14 @@ def optimize(time, step, population):
     for i in range(10):
         optimization_value = 0
         optimization_delimiter = 0
-        for j in range(20):
+        for j in range(100):
             population_copy = copy.deepcopy(population)
-            population_copy.transition_medical_matrix[1][0] += 0.01 * i
+            population_copy.transition_medical_matrix[1][1] += 0.05 * i
             simulate(time, step, population_copy)
             optimization_value += population_copy.infected_dead
-            optimization_delimiter += population_copy.state_distribution[1][3]
-        optimization_value /= 20
-        optimization_delimiter /= 20
+            optimization_delimiter += population_copy.state_distribution[2][3]
+        optimization_value /= 100
+        optimization_delimiter /= 100
         print(optimization_value)
         if i == 0:
             optimize_default = optimization_value
@@ -61,11 +61,11 @@ def optimize(time, step, population):
             optimization_vector.append((optimize_default - optimization_value) / (
                     optimization_delimiter - optimize_delimiter_default))
         print(optimization_delimiter)
-    time_vector = list([0.00186468954542118 + 0.01 * i for i in range(10)])
+    time_vector = list([0.0263742426647091 + 0.05 * i for i in range(10)])
     plt.grid(True)
     plt.plot(time_vector, optimization_vector)
-    plt.xlabel('Параметр керування, P(th)')
-    plt.ylabel('Δd/E')
+    plt.xlabel('Параметр керування, P(ta)')
+    plt.ylabel('Δd/Th')
     plt.show()
 
 

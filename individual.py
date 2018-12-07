@@ -3,9 +3,10 @@ import numpy as np
 
 
 class Individual:
-    def __init__(self, state, medical_state):
+    def __init__(self, state, medical_state, additional_state=0):
         self.state = state
         self.medical_state = medical_state
+        self.additional_state = additional_state
         self.last_examination_count = [0, 0]
 
     def __repr__(self):
