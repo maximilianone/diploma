@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from plot_builder import build_plot
 from population import Population
+from monte_carlo import find_deviation
 
 
 def values_to_statistic(status_distribution_sequences):
@@ -65,7 +66,7 @@ population.average_infected_vector = [0.14162747716319577, 0.017622648234252702]
 population.wrong_examination = 0
 population.populate()
 
-names = ['Здорові (вразливі)', 'ВІЧ-інфіковані', 'хворі на СПІД', 'Отримуючі АРТ']
+names = ['Здорові (вразливі)', 'ВІЛ-інфіковані', 'Хворі на СПІД', 'Отримуючі АРТ']
 time_sequence = list([i for i in range(time + 1)])
 
 
@@ -78,4 +79,6 @@ def optimize(time, step, population):
     return values_to_statistic(distribution_sequences)
 
 
-build_plot(optimize(time, step, population), statistic_values, time_sequence, names)
+simulation = optimize(time, step, population)
+print(find_deviation(statistic_values, simulation))
+build_plot(simulation, statistic_values, time_sequence, names)

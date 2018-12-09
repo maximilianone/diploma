@@ -74,32 +74,34 @@ def prepare_population_count(count):
     return int(np.round(count))
 
 
-def change_state(population, individual):
+def change_state(population, individual, state='state'):
     if individual.medical_state == 3:
-        change_state_with_matrix(population, individual, population.transition_treated_matrix)
+        change_state_with_matrix(population, individual, population.transition_treated_matrix, state)
     else:
-        change_state_with_matrix(population, individual, population.transition_matrix)
+        change_state_with_matrix(population, individual, population.transition_matrix, state)
 
 
-def change_state_with_matrix(population, individual, transition_matrix):
+def change_state_with_matrix(population, individual, transition_matrix, state, last_is_death=True):
     rand = uniform(0, 1)
-    for i in range(len(transition_matrix[individual.state])):
-        if markov_transition(rand, transition_matrix[individual.state], i):
-            population.state_distribution[individual.state][individual.medical_state] -= 1
-            if not individual.medical_state == 0:
-                population.state_distribution[individual.state][0] -= 1
-            if individual.medical_state == 3:
-                population.state_distribution[individual.state][2] -= 1
-            if i == len(transition_matrix[individual.state]) - 1:
+    for i in range(len(transition_matrix[getattr(individual, state)])):
+        if markov_transition(rand, transition_matrix[getattr(individual, state)], i):
+            if state == 'state':
+                population.state_distribution[getattr(individual, state)][individual.medical_state] -= 1
+                if not individual.medical_state == 0:
+                    population.state_distribution[getattr(individual, state)][0] -= 1
+                if individual.medical_state == 3:
+                    population.state_distribution[getattr(individual, state)][2] -= 1
+            if last_is_death and i == len(transition_matrix[getattr(individual, state)]) - 1:
                 population.members.remove(individual)
                 population.infected_dead += 1
             else:
-                individual.state = i
-                population.state_distribution[individual.state][individual.medical_state] += 1
-                if not individual.medical_state == 0:
-                    population.state_distribution[individual.state][0] += 1
-                if individual.medical_state == 3:
-                    population.state_distribution[individual.state][2] += 1
+                setattr(individual, state, i)
+                if state == 'state':
+                    population.state_distribution[getattr(individual, state)][individual.medical_state] += 1
+                    if not individual.medical_state == 0:
+                        population.state_distribution[getattr(individual, state)][0] += 1
+                    if individual.medical_state == 3:
+                        population.state_distribution[getattr(individual, state)][2] += 1
 
 
 def change_medical_state(population, individual, transition_matrix):

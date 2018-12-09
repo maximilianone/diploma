@@ -41,12 +41,12 @@ def get_transition_matrices(df):
 
     transition_matrix_hpv, deviation_hpv = find_transition_matrix(clusters_parts_hpv, False)
     transition_matrix_cin_hpv, deviation_cin_hpv = find_transition_matrix(clusters_parts_cin_hpv, True)
-    transition_matrix_cin_no_hpv, deviation_cin_no_hpv = find_transition_matrix(clusters_parts_cin_no_hpv, True)
+    transition_matrix_cin_no_hpv, deviation_cin_no_hpv = find_transition_matrix(clusters_parts_cin_no_hpv, True, True)
     print(deviation_hpv, deviation_cin_hpv, deviation_cin_no_hpv)
     print(transition_matrix_hpv, '\n', transition_matrix_cin_hpv, '\n', transition_matrix_cin_no_hpv)
 
 
-def find_transition_matrix(clusters_parts, last_is_screen):
+def find_transition_matrix(clusters_parts, last_is_screen, minimize_to_last=False):
     parameter_matrix = []
     target_matrix = []
     for i in range(len(clusters_parts) - 1):
@@ -67,7 +67,7 @@ def find_transition_matrix(clusters_parts, last_is_screen):
     if last_is_screen:
         transport_matrix[len(transport_matrix) - 1] = np.zeros(len(transport_matrix))
         transport_matrix[len(transport_matrix) - 1][len(transport_matrix) - 1] = 1
-    transport_matrix = optimize(clusters_parts, transport_matrix, last_is_screen)
+    transport_matrix = optimize(clusters_parts, transport_matrix, last_is_screen, minimize_to_last)
 
     deviation = find_deviation(clusters_parts, transport_matrix, True)
 
@@ -89,15 +89,15 @@ def find_cluster_parts(clusters, data):
 def find_deviation(expected, transport_matrix, to_print):
     deviation = 0
     for i in range(len(expected) - 1):
-        test = np.matrix(expected[i]) * np.matrix(transport_matrix)
+        test = np.matrix(transport_matrix) * np.matrix(expected[i]).T
         if to_print:
-            print(np.sqrt(np.sum([a ** 2 for a in (np.asarray(test) - np.array(expected[i + 1]))]) / 2),
-                  expected[i + 1], test)
-        deviation += np.sqrt(np.sum([a ** 2 for a in (np.asarray(test) - np.array(expected[i + 1]))]) / 2)
+            print(np.sqrt(np.sum([a ** 2 for a in (np.asarray(test.T) - np.array(expected[i + 1]))]) / 2),
+                  expected[i + 1], test.T)
+        deviation += np.sqrt(np.sum([a ** 2 for a in (np.asarray(test.T) - np.array(expected[i + 1]))]) / 2)
     return deviation / (len(expected) - 1)
 
 
-def optimize(expected, transport_matrix, last_is_screen):
+def optimize(expected, transport_matrix, last_is_screen, minimize_to_last):
     border = len(transport_matrix) if not last_is_screen else len(transport_matrix) - 1
     result = transport_matrix
     deviation = find_deviation(expected, transport_matrix, False)
@@ -111,9 +111,14 @@ def optimize(expected, transport_matrix, last_is_screen):
                     transport_matrix_copy[j][k] += rand
                     if transport_matrix_copy[j][k] < 0:
                         transport_matrix_copy[j][k] = 0
-            if last_is_screen and transport_matrix_copy[j][len(transport_matrix_copy) - 1] < 0.05:
-                transport_matrix_copy[j][len(transport_matrix_copy) - 1] += 0.1
-                transport_matrix_copy[j][j] -= 0.1
+            min_value = 0.005 if minimize_to_last else 0.05
+            if last_is_screen and transport_matrix_copy[j][len(transport_matrix_copy) - 1] < min_value:
+                transport_matrix_copy[j][len(transport_matrix_copy) - 1] += min_value
+                transport_matrix_copy[j][j] -= min_value
+            max_value = 0.01 if minimize_to_last else 0.06
+            while last_is_screen and transport_matrix_copy[j][len(transport_matrix_copy) - 1] > max_value:
+                transport_matrix_copy[j][len(transport_matrix_copy) - 1] -= max_value
+                transport_matrix_copy[j][j] += max_value
             transport_matrix_copy[j][j] = 1 - np.sum(transport_matrix_copy[j, :j]) - np.sum(
                 transport_matrix_copy[j, j + 1:])
         new_deviation = find_deviation(expected, transport_matrix_copy, False)
